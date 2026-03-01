@@ -1,0 +1,24 @@
+<!-- ═══ res/drawable/bg_role_tab_selector.xml ═══ -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/colorNavy" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+    <item android:state_checked="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/colorNavy" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/colorBackground" />
+            <stroke
+                android:width="1dp"
+                android:color="@color/colorBorder" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+</selector>

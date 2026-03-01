@@ -1,0 +1,19 @@
+<!-- ═══ res/menu/bottom_nav_student.xml ═══ -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_home"
+        android:title="@string/menu_home" />
+    <item
+        android:id="@+id/nav_logbook"
+        android:icon="@drawable/ic_book"
+        android:title="@string/menu_logbook" />
+    <item
+        android:id="@+id/nav_reviews"
+        android:icon="@drawable/ic_checklist"
+        android:title="@string/menu_reviews" />
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_person"
+        android:title="@string/menu_profile" />
+</menu>

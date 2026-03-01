@@ -1,0 +1,129 @@
+<!-- ═══ res/layout/item_logbook_entry.xml (FIXED — Guaranteed No Overlap) ═══ -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
+
+    <!-- Use a horizontal LinearLayout as root to separate the status indicator from content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- 1. Left Status Indicator Bar -->
+        <View
+            android:id="@+id/vStatusIndicator"
+            android:layout_width="4dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorGreen" />
+
+        <!-- 2. Main Content Container (Vertical flow ensures no vertical overlap) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Header Strip: [Week Label] [Status Badge] -->
+            <LinearLayout
+                android:id="@+id/llHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorGreenBg"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/tvWeekLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="WEEK 04 (01/03/24 - 07/03/24)"
+                    android:textColor="@color/colorGreen"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvStatusBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_badge_green"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:text="SIGNED"
+                    android:textColor="@color/colorGreen"
+                    android:textSize="8sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Body: Work Carried Out -->
+            <TextView
+                android:id="@+id/tvWorkText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="Implemented the initial CNN architecture for image classification. Processed dataset for training and validation."
+                android:textColor="@color/colorTextPrimary"
+                android:textSize="12sp" />
+
+            <!-- Divider -->
+            <View
+                android:id="@+id/viewDivider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="12dp"
+                android:background="@color/colorBorder" />
+
+            <!-- Mentor Remark -->
+            <TextView
+                android:id="@+id/tvMentorRemark"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="Good progress. Focus on improving accuracy in the next iteration."
+                android:textColor="@color/colorTextMuted"
+                android:textSize="11sp"
+                android:textStyle="italic" />
+
+            <!-- Grade Chips (Visibility handled via Java) -->
+            <LinearLayout
+                android:id="@+id/llGradeChips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:paddingBottom="12dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_badge_grey"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="Grade: 9/10"
+                    android:textColor="@color/colorNavy"
+                    android:textSize="9sp" />
+            </LinearLayout>
+
+            <!-- Action Button: Add Remark & Sign (Visibility handled via Java) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSignLog"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="12dp"
+                android:layout_marginBottom="4dp"
+                android:text="Add Remark &amp; Sign"
+                android:textColor="@color/colorNavy"
+                android:textSize="10sp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
