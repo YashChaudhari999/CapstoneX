@@ -1,22 +1,23 @@
-<!-- ═══ res/layout/activity_topic_approval.xml (FIXED Namespace) ═══ -->
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground">
+    android:background="@color/colorOuterBg">
 
-    <!-- AppBar Section -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorNavyDark">
+        android:background="@color/colorTopBar"
+        app:elevation="4dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_back">
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationIconTint="#FFFFFF">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -27,290 +28,127 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/title_topic_approval"
-                    android:textColor="@color/colorWhite"
-                    android:textSize="16sp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/subtitle_form_a2"
-                    android:textColor="@color/colorTextMuted"
-                    android:textSize="10sp" />
+                    android:textColor="#CCFFFFFF"
+                    android:textSize="11sp" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/colorGold" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Scrollable Content Section -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        android:fadeScrollbars="false"
+        android:background="@color/colorMainBg"
+        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- Main Vertical Container -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- SECTION: PROJECT DETAILS -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_section_label"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="8dp">
-
-                <View
-                    android:layout_width="3dp"
-                    android:layout_height="16dp"
-                    android:background="@color/colorGold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="@string/section_project_details"
-                    android:textColor="@color/colorNavy"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:hint="@string/hint_project_title">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etProjectTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:hint="Motivation &amp; Objectives">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etMotivation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="top"
-                    android:inputType="textMultiLine"
-                    android:minLines="3" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Project Type Selection -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Project Type"
-                android:textColor="@color/colorTextPrimary"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <RadioGroup
-                android:id="@+id/rgProjectType"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:orientation="horizontal">
-
-                <RadioButton
-                    android:id="@+id/rbResearch"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_role_tab_selector"
-                    android:button="@null"
-                    android:gravity="center"
-                    android:padding="10dp"
-                    android:text="Research"
-                    android:textColor="@color/colorNavy"
-                    android:textSize="11sp" />
-
-                <RadioButton
-                    android:id="@+id/rbApplication"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginHorizontal="8dp"
-                    android:background="@drawable/bg_role_tab_selector"
-                    android:button="@null"
-                    android:gravity="center"
-                    android:padding="10dp"
-                    android:text="Application"
-                    android:textColor="@color/colorNavy"
-                    android:textSize="11sp" />
-
-                <RadioButton
-                    android:id="@+id/rbOther"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_role_tab_selector"
-                    android:button="@null"
-                    android:gravity="center"
-                    android:padding="10dp"
-                    android:text="Other"
-                    android:textColor="@color/colorNavy"
-                    android:textSize="11sp" />
-            </RadioGroup>
-
-            <!-- SECTION: OBJECTIVES -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_section_label"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="8dp">
+                android:text="@string/section_project_details"
+                style="@style/Capstone.Text.SectionHeader" />
 
-                <View
-                    android:layout_width="3dp"
-                    android:layout_height="16dp"
-                    android:background="@color/colorGold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="@string/section_objectives"
-                    android:textColor="@color/colorNavy"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:hint="Enter specific outcomes...">
+                style="@style/Widget.Capstone.CardView">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etObjectives"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="top"
-                    android:inputType="textMultiLine"
-                    android:minLines="4" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:background="@drawable/bg_card_with_border"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-            <!-- SECTION: REFERENCES -->
-            <LinearLayout
-                android:layout_width="match_parent"
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_project_title">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etProjectTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:hint="Motivation &amp; Objectives">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etMotivation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="top"
+                            android:inputType="textMultiLine"
+                            android:minLines="3" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_section_label"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="8dp">
+                android:text="@string/section_objectives"
+                style="@style/Capstone.Text.SectionHeader" />
 
-                <View
-                    android:layout_width="3dp"
-                    android:layout_height="16dp"
-                    android:background="@color/colorGold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="@string/section_references"
-                    android:textColor="@color/colorNavy"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Reference Fields -->
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:hint="Reference 1">
+                style="@style/Widget.Capstone.CardView">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etRef1"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:background="@drawable/bg_card_with_border"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:hint="Reference 2">
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Enter specific outcomes...">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etRef2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etObjectives"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="top"
+                            android:inputType="textMultiLine"
+                            android:minLines="4" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                android:hint="Reference 3">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etRef3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Submit Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSubmitApproval"
+                style="@style/Widget.Capstone.Button"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginBottom="16dp"
-                android:text="@string/btn_submit"
-                android:textStyle="bold" />
-
-            <!-- Status Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cvStatus"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:visibility="gone"
-                app:cardBackgroundColor="@color/colorNavyDark"
-                app:strokeColor="@color/colorGold"
-                app:strokeWidth="1dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:text="Status: Pending Review"
-                    android:textColor="@color/colorGold"
-                    android:textStyle="bold" />
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="32dp"
+                android:text="@string/btn_submit" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

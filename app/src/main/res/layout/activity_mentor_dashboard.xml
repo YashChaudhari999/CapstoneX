@@ -1,11 +1,11 @@
-<!-- ═══ res/layout/activity_mentor_dashboard.xml (FIXED — No Overlap) ═══ -->
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground">
+    android:background="@color/colorOuterBg">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -14,55 +14,41 @@
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorNavyDark"
-            app:elevation="0dp">
+            android:background="@color/colorTopBar"
+            app:elevation="4dp">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:navigationIcon="@drawable/ic_menu">
+                app:navigationIcon="@drawable/ic_menu"
+                app:navigationIconTint="#FFFFFF">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/title_mentor_dashboard"
-                    android:textColor="@color/colorWhite"
+                    android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                <ImageView
+                    android:id="@+id/ivNotifications"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_gravity="end"
-                    android:paddingEnd="16dp">
-
-                    <ImageView
-                        android:id="@+id/ivBellMentor"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_bell"
-                        app:tint="@color/colorWhite" />
-
-                    <View
-                        android:layout_width="8dp"
-                        android:layout_height="8dp"
-                        android:layout_gravity="top|end"
-                        android:layout_marginTop="16dp"
-                        android:background="@drawable/bg_badge_gold" />
-                </FrameLayout>
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/ic_launcher_background"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_bell"
+                    app:tint="@color/colorAccentYellow" />
             </androidx.appcompat.widget.Toolbar>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/colorGold" />
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/colorMainBg"
             android:fillViewport="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -72,28 +58,26 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Mentor Profile Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="24dp"
-                    app:cardBackgroundColor="@color/colorNavy"
-                    app:strokeColor="@color/colorGold"
-                    app:strokeWidth="1.5dp">
+                    app:cardBackgroundColor="@color/colorLearningNavy"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="8dp">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16dp">
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="20dp">
 
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/cvMentorAvatar"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            app:cardCornerRadius="30dp"
-                            app:cardElevation="0dp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            app:cardCornerRadius="32dp"
+                            app:cardElevation="2dp">
 
                             <ImageView
                                 android:layout_width="match_parent"
@@ -102,92 +86,56 @@
                                 android:src="@drawable/ic_person" />
                         </com.google.android.material.card.MaterialCardView>
 
-                        <!-- Used horizontal barrier or explicit constraints to prevent overlap with the badge -->
                         <LinearLayout
-                            android:id="@+id/llMentorInfo"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:layout_marginEnd="8dp"
-                            android:orientation="vertical"
-                            app:layout_constraintBottom_toBottomOf="@id/cvMentorAvatar"
-                            app:layout_constraintEnd_toStartOf="@id/tvGroupCountBadge"
-                            app:layout_constraintStart_toEndOf="@id/cvMentorAvatar"
-                            app:layout_constraintTop_toTopOf="@id/cvMentorAvatar">
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:id="@+id/tvMentorName"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Dr. Rajesh Patel"
-                                android:textColor="@color/colorWhite"
-                                android:textSize="16sp"
+                                android:textColor="#FFFFFF"
+                                android:textSize="18sp"
                                 android:textStyle="bold" />
 
                             <TextView
-                                android:id="@+id/tvMentorDesignation"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Associate Professor · IT Dept"
-                                android:textColor="@color/colorNavyLight"
-                                android:textSize="11sp" />
+                                android:layout_marginTop="2dp"
+                                android:text="Faculty Mentor · IT Dept"
+                                android:textColor="#CCFFFFFF"
+                                android:textSize="12sp" />
                         </LinearLayout>
-
-                        <TextView
-                            android:id="@+id/tvGroupCountBadge"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_badge_gold"
-                            android:paddingHorizontal="10dp"
-                            android:paddingVertical="4dp"
-                            android:text="8 Groups"
-                            android:textColor="@color/colorGoldDark"
-                            android:textSize="10sp"
-                            android:textStyle="bold"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
-                    android:background="@drawable/bg_section_label"
-                    android:gravity="center_vertical"
-                    android:padding="8dp">
-
-                    <View
-                        android:layout_width="3dp"
-                        android:layout_height="16dp"
-                        android:background="@color/colorGold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/section_my_groups"
-                        android:textColor="@color/colorNavy"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                    android:text="@string/section_my_groups"
+                    style="@style/Capstone.Text.SectionHeader" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvGroups"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false" />
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/item_project_group" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSummary"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.Capstone.Button"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="24dp"
-                    android:text="VIEW ACADEMIC SUMMARY"
-                    android:textColor="@color/colorNavy"
-                    app:strokeColor="@color/colorNavy" />
+                    android:layout_height="56dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="32dp"
+                    android:text="VIEW ACADEMIC SUMMARY" />
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
@@ -199,6 +147,9 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="@color/colorSidebarBg"
+        app:itemIconTint="#FFFFFF"
+        app:itemTextColor="#FFFFFF"
         app:headerLayout="@layout/nav_header_mentor"
         app:menu="@menu/mentor_drawer_menu" />
 

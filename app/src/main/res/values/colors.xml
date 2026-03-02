@@ -1,31 +1,27 @@
-<!-- ═══ res/values/colors.xml ═══ -->
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- NMIMS official brand palette -->
-    <color name="colorNavy">#003A8F</color> <!-- dominant brand, buttons, active states -->
-    <color name="colorNavyDark">#002060</color> <!-- all AppBars and Toolbars -->
-    <color name="colorNavyMid">#0B3D91</color> <!-- mentor screens -->
-    <color name="colorNavyLight">#E8EEF9</color> <!-- light tint cards and chips -->
-    <color name="colorGold">#C9A227</color> <!-- accent line, pending badge, FAB ring -->
-    <color name="colorGoldLight">#FDF6E3</color> <!-- gold tint background -->
-    <color name="colorGoldDark">#A07D10</color> <!-- gold text on light bg -->
-    <color name="colorWhite">#FFFFFF</color>
-    <color name="colorBackground">#F0F4FB</color> <!-- root/window background -->
-    <color name="colorTextPrimary">#0D1B3E</color>
-    <color name="colorTextMuted">#5C6E9A</color>
-    <color name="colorBorder">#D0DAF0</color>
-    <color name="colorGreen">#1B7A4E</color> <!-- completed / signed -->
-    <color name="colorGreenBg">#E6F4ED</color>
-    <color name="colorWarn">#B85C00</color> <!-- overdue / warning -->
-    <color name="colorWarnBg">#FFF0E0</color>
-    <color name="colorRed">#B81C1C</color> <!-- error / rejected -->
-    <color name="colorRedBg">#FDEAEA</color>
+    <!-- Primary Brand Colors -->
+    <color name="colorTopBar">#7A0C0C</color>
+    <color name="colorDashboardRed">#9B1B1B</color>
+    <color name="colorLearningNavy">#1C3D58</color>
+    <color name="colorSidebarBg">#2B2B2B</color>
 
-    <!-- Project Colors -->
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Background & Neutrals -->
+    <color name="colorMainBg">#EFEFEF</color>
+    <color name="colorOuterBg">#DCDCDC</color>
+    <color name="colorCardBg">#FFFFFF</color>
+    <color name="colorCardLabel">#555555</color>
+    <color name="colorDownloadPanel">#5A5A5A</color>
+    <color name="colorBodyText">#1A1A1A</color>
+    <color name="colorMutedText">#888888</color>
+
+    <!-- Accent / Icon Colors -->
+    <color name="colorAccentYellow">#F5C518</color>
+    <color name="colorAccentGreen">#28A745</color>
+    <color name="colorAccentRed">#DC3545</color>
+    <color name="colorAccentBlue">#007BFF</color>
+    <color name="colorAccentTeal">#0B9E8A</color>
+    <color name="colorAccentOrange">#FD7E14</color>
+
+    <color name="white">#FFFFFF</color>
 </resources>

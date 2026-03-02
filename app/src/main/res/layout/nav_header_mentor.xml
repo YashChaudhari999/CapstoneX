@@ -1,34 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="176dp"
-    android:background="@color/colorNavyDark"
-    android:gravity="bottom"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    android:background="@color/colorTopBar"
+    android:padding="16dp">
 
-    <ImageView
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cvMentorHeaderAvatar"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:paddingTop="8dp"
-        android:src="@drawable/ic_person"
-        app:tint="@color/colorWhite" />
+        app:cardCornerRadius="32dp"
+        app:cardElevation="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/tvMentorHeaderName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_person"
+            app:tint="@color/colorTopBar" />
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/tvMentorHeaderName"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingTop="8dp"
+        android:layout_marginTop="12dp"
         android:text="Dr. Rajesh Patel"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="@color/colorWhite"
-        android:textStyle="bold" />
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/tvMentorHeaderEmail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cvMentorHeaderAvatar" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/tvMentorHeaderEmail"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="rajesh.patel@nmims.edu"
-        android:textColor="@color/colorTextMuted" />
+        android:textColor="#CCFFFFFF"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvMentorHeaderName" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,44 +1,38 @@
-<!-- ═══ res/layout/activity_student_dashboard.xml (FIXED — No Overlap) ═══ -->
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground">
+    android:background="@color/colorOuterBg">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorNavyDark"
-        app:elevation="0dp">
+        android:background="@color/colorTopBar"
+        app:elevation="4dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:contentInsetStart="0dp">
+            android:layout_height="?attr/actionBarSize"
+            app:contentInsetStart="16dp">
 
-            <!-- 1. Header Row (Avatar + Name + Bell) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cvAvatar"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="@color/colorGold"
-                    app:strokeWidth="1.5dp">
+                    app:cardElevation="2dp">
 
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:contentDescription="Avatar"
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_person" />
                 </com.google.android.material.card.MaterialCardView>
@@ -51,139 +45,32 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/tvGreeting"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/welcome_greeting"
-                        android:textColor="@color/colorTextMuted"
-                        android:textSize="10sp" />
-
-                    <TextView
                         android:id="@+id/tvStudentName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Student Name"
-                        android:textColor="@color/colorWhite"
-                        android:textSize="14sp"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
                 <ImageView
-                    android:id="@+id/ivBell"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:id="@+id/ivNotifications"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/ic_launcher_background"
+                    android:padding="6dp"
                     android:src="@drawable/ic_bell"
-                    app:tint="@color/colorWhite" />
+                    app:tint="@color/colorAccentYellow" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
-
-        <!-- 2. Student Info (SAP/Roll/Sem) -->
-        <TextView
-            android:id="@+id/tvStudentDetails"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="16dp"
-            android:paddingBottom="12dp"
-            android:text="SAP ID: 700123456 | ROLL: 101 | SEM: 7 | B.Tech IT"
-            android:textColor="@color/colorTextMuted"
-            android:textSize="9sp" />
-
-        <!-- 3. Progress Block (Label + Bar + %) -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingBottom="16dp">
-
-            <TextView
-                android:id="@+id/tvProgressLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/overall_progress"
-                android:textColor="@color/colorWhite"
-                android:textSize="10sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ProgressBar
-                    android:id="@+id/pbOverall"
-                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                    android:layout_width="0dp"
-                    android:layout_height="4dp"
-                    android:layout_weight="1"
-                    android:progress="65"
-                    android:progressDrawable="@drawable/bg_badge_gold" />
-
-                <TextView
-                    android:id="@+id/tvProgressPercent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="65%"
-                    android:textColor="@color/colorGold"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- 4. Project Title Card -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="0dp"
-            app:strokeColor="@color/colorGold"
-            app:strokeWidth="1dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="12dp">
-
-                <TextView
-                    android:id="@+id/tvProjectTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Project Title: AI Based Smart Surveillance System"
-                    android:textColor="@color/colorWhite"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <ImageView
-                    android:id="@+id/ivChevron"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginStart="8dp"
-                    android:src="@drawable/ic_chevron_right"
-                    app:tint="@color/colorGold" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Gold Bar Brand Accent -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/colorGold" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- ══ Scrollable Stages ══ -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
+        android:background="@color/colorMainBg"
         android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -191,175 +78,204 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:paddingBottom="80dp">
+            android:padding="16dp">
 
-            <!-- Stage Card 1 -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                app:cardElevation="2dp">
+                android:text="DASHBOARD OVERVIEW"
+                style="@style/Capstone.Text.SectionHeader" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:rowCount="2">
+
+                <!-- Courses Tile -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <View
-                        android:id="@+id/vStatus1"
-                        android:layout_width="5dp"
-                        android:layout_height="64dp"
-                        android:background="@color/colorGreen" />
+                    android:layout_columnWeight="1"
+                    style="@style/Widget.Capstone.CardView">
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="12dp">
+                        android:padding="16dp">
+
+                        <FrameLayout
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@color/colorAccentBlue">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_book"
+                                app:tint="#FFFFFF" />
+                        </FrameLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Project Registration"
-                            android:textColor="@color/colorNavy"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Phase A.1 - Team &amp; Domain Selection"
-                            android:textColor="@color/colorTextMuted"
-                            android:textSize="11sp" />
+                            android:layout_marginTop="8dp"
+                            android:text="Courses"
+                            style="@style/Capstone.Text.Body" />
                     </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                    <TextView
-                        android:id="@+id/tvBadge1"
-                        android:layout_width="wrap_content"
+                <!-- Feedback Tile -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    style="@style/Widget.Capstone.CardView">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="12dp"
-                        android:background="@drawable/bg_badge_green"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="4dp"
-                        android:text="COMPLETED"
-                        android:textColor="@color/colorGreen"
-                        android:textSize="9sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
-            <!-- Stage Card 2 -->
+                        <FrameLayout
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@color/colorAccentTeal">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_checklist"
+                                app:tint="#FFFFFF" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Feedback"
+                            style="@style/Capstone.Text.Body" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Attendance Tile -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    style="@style/Widget.Capstone.CardView">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <FrameLayout
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@color/colorAccentGreen">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_person"
+                                app:tint="#FFFFFF" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Attendance"
+                            style="@style/Capstone.Text.Body" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Warnings Tile -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    style="@style/Widget.Capstone.CardView">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <FrameLayout
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@color/colorAccentOrange">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_bell"
+                                app:tint="#FFFFFF" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Warnings"
+                            style="@style/Capstone.Text.Body" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </GridLayout>
+
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardElevation="2dp">
+                android:layout_marginTop="16dp"
+                style="@style/Widget.Capstone.CardView">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <View
-                        android:id="@+id/vStatus2"
-                        android:layout_width="5dp"
-                        android:layout_height="64dp"
-                        android:background="@color/colorGold" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:padding="12dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Topic Approval"
-                            android:textColor="@color/colorNavy"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Phase A.2 - Abstract &amp; Objectives"
-                            android:textColor="@color/colorTextMuted"
-                            android:textSize="11sp" />
-                    </LinearLayout>
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_card_with_border"
+                    android:padding="16dp">
 
                     <TextView
-                        android:id="@+id/tvBadge2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="12dp"
-                        android:background="@drawable/bg_badge_gold"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="4dp"
-                        android:text="PENDING"
-                        android:textColor="@color/colorGold"
-                        android:textSize="9sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        android:text="PROJECT PROGRESS"
+                        style="@style/Capstone.Text.SectionHeader" />
 
-            <!-- Mentor Info Strip -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/colorNavyLight"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorder"
-                app:strokeWidth="1dp">
+                    <ProgressBar
+                        android:id="@+id/pbOverall"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:layout_marginTop="16dp"
+                        android:progress="65"
+                        android:progressTint="@color/colorAccentGreen" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="12dp">
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_person"
-                        app:tint="@color/colorNavy" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/tvProgressPercent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Assigned Mentor"
-                            android:textColor="@color/colorTextMuted"
-                            android:textSize="9sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Dr. Rajesh Patel"
-                            android:textColor="@color/colorNavy"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_person"
-                        app:tint="@color/colorNavy" />
+                        android:layout_gravity="end"
+                        android:layout_marginTop="4dp"
+                        android:text="65% Completed"
+                        style="@style/Capstone.Text.CardLabel" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="100dp" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -369,10 +285,9 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_gravity="bottom"
-        android:background="@color/colorWhite"
-        android:elevation="8dp"
-        app:itemIconTint="@color/bottom_nav_tint"
-        app:itemTextColor="@color/bottom_nav_tint"
+        android:background="@color/colorSidebarBg"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_student" />
 

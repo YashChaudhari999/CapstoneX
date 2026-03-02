@@ -1,20 +1,22 @@
-<!-- ═══ res/values/themes.xml ═══ -->
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.CapstoneX" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/colorNavy</item>
-        <item name="colorPrimaryVariant">@color/colorNavyDark</item>
-        <item name="colorOnPrimary">@color/colorWhite</item>
+        <item name="colorPrimary">@color/colorTopBar</item>
+        <item name="colorPrimaryVariant">@color/colorTopBar</item>
+        <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/colorGold</item>
-        <item name="colorSecondaryVariant">@color/colorGoldDark</item>
-        <item name="colorOnSecondary">@color/colorWhite</item>
+        <item name="colorSecondary">@color/colorDashboardRed</item>
+        <item name="colorSecondaryVariant">@color/colorDashboardRed</item>
+        <item name="colorOnSecondary">@color/white</item>
+        
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">@color/colorNavyDark</item>
-        <!-- Customize your theme here. -->
-        <item name="android:windowBackground">@color/colorBackground</item>
-        <item name="colorSurface">@color/colorWhite</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/colorTopBar</item>
+        
+        <!-- Background colors -->
+        <item name="android:windowBackground">@color/colorMainBg</item>
+        <item name="colorSurface">@color/colorCardBg</item>
 
         <!-- Widget Styles -->
         <item name="materialButtonStyle">@style/Widget.Capstone.Button</item>
@@ -22,32 +24,53 @@
         <item name="textInputStyle">@style/Widget.Capstone.TextInputLayout.OutlinedBox</item>
     </style>
 
-    <style name="Theme.CapstoneX.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
     <style name="Widget.Capstone.Button" parent="Widget.MaterialComponents.Button">
-        <item name="cornerRadius">10dp</item>
+        <item name="backgroundTint">@color/colorDashboardRed</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">8dp</item>
         <item name="android:minHeight">48dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
-        <item name="android:textAllCaps">true</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">14sp</item>
+        <item name="rippleColor">#40FFFFFF</item>
     </style>
 
     <style name="Widget.Capstone.CardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/colorCardBg</item>
+        <item name="cardElevation">4dp</item>
         <item name="cardCornerRadius">12dp</item>
-        <item name="cardElevation">2dp</item>
+        <item name="android:layout_margin">8dp</item>
     </style>
 
     <style name="Widget.Capstone.TextInputLayout.OutlinedBox" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">@color/colorNavy</item>
-        <item name="hintTextColor">@color/colorTextMuted</item>
+        <item name="boxStrokeColor">@color/colorLearningNavy</item>
+        <item name="hintTextColor">@color/colorMutedText</item>
         <item name="boxCornerRadiusTopStart">10dp</item>
         <item name="boxCornerRadiusTopEnd">10dp</item>
         <item name="boxCornerRadiusBottomStart">10dp</item>
         <item name="boxCornerRadiusBottomEnd">10dp</item>
+    </style>
+
+    <style name="Capstone.Text.SectionHeader">
+        <item name="android:textColor">@color/colorLearningNavy</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Capstone.Text.Body">
+        <item name="android:textColor">@color/colorBodyText</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Capstone.Text.Muted">
+        <item name="android:textColor">@color/colorMutedText</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="Capstone.Text.CardLabel">
+        <item name="android:textColor">@color/colorCardLabel</item>
+        <item name="android:textSize">12sp</item>
     </style>
 </resources>

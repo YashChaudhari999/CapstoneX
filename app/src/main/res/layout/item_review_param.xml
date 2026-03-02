@@ -1,151 +1,142 @@
-<!-- ═══ res/layout/item_review_param.xml (FIXED — Guaranteed No Overlap) ═══ -->
+<?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="12dp"
-    android:layout_marginVertical="6dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp">
+    style="@style/Widget.Capstone.CardView">
 
-    <!-- Use a horizontal LinearLayout as root to separate the accent bar from content -->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:paddingBottom="16dp">
 
-        <!-- 1. Left Accent Bar -->
+        <!-- Left Accent Stripe -->
         <View
-            android:id="@+id/vAccentBar"
+            android:id="@+id/vStripe"
             android:layout_width="4dp"
-            android:layout_height="match_parent"
-            android:background="@color/colorNavy" />
+            android:layout_height="0dp"
+            android:background="@color/colorLearningNavy"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- 2. Main Content Container (Vertical flow ensures no vertical overlap) -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- Letter Indicator -->
+        <TextView
+            android:id="@+id/tvParamLetter"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/colorMainBg"
+            android:gravity="center"
+            android:text="A"
+            android:textColor="@color/colorLearningNavy"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/vStripe"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tvParamTitle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:text="Technical Implementation"
+            style="@style/Capstone.Text.SectionHeader"
+            app:layout_constraintBottom_toBottomOf="@id/tvParamLetter"
+            app:layout_constraintEnd_toStartOf="@+id/tvCurrentScore"
+            app:layout_constraintStart_toEndOf="@id/tvParamLetter"
+            app:layout_constraintTop_toTopOf="@id/tvParamLetter" />
 
-            <!-- Header Row: [Letter] [Title] [Badge] -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+        <!-- Current Score Display -->
+        <TextView
+            android:id="@+id/tvCurrentScore"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@color/colorMainBg"
+            android:gravity="center"
+            android:text="3"
+            android:textColor="@color/colorDashboardRed"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/tvParamLetter"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:background="@drawable/bg_badge_grey"
-                    android:gravity="center"
-                    android:text="A"
-                    android:textColor="@color/colorNavy"
-                    android:textSize="10sp"
-                    android:textStyle="bold" />
+        <!-- Description -->
+        <TextView
+            android:id="@+id/tvParamDesc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Depth of technical complexity and implementation quality."
+            style="@style/Capstone.Text.Muted"
+            app:layout_constraintEnd_toEndOf="@id/tvCurrentScore"
+            app:layout_constraintStart_toStartOf="@id/tvParamLetter"
+            app:layout_constraintTop_toBottomOf="@id/tvParamLetter" />
 
-                <TextView
-                    android:id="@+id/tvParamTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:text="Technical Implementation"
-                    android:textColor="@color/colorNavy"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+        <!-- SeekBar -->
+        <SeekBar
+            android:id="@+id/sbScore"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:max="3"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:progress="1"
+            android:progressTint="@color/colorDashboardRed"
+            android:thumbTint="@color/colorAccentYellow"
+            app:layout_constraintEnd_toEndOf="@id/tvCurrentScore"
+            app:layout_constraintStart_toStartOf="@id/tvParamLetter"
+            app:layout_constraintTop_toBottomOf="@id/tvParamDesc" />
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cvScoreBadge"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="8dp"
-                    app:cardBackgroundColor="@color/colorNavyLight"
-                    app:cardCornerRadius="18dp"
-                    app:cardElevation="0dp">
+        <!-- SeekBar Labels -->
+        <LinearLayout
+            android:id="@+id/llLabels"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="@id/sbScore"
+            app:layout_constraintStart_toStartOf="@id/sbScore"
+            app:layout_constraintTop_toBottomOf="@id/sbScore">
 
-                    <TextView
-                        android:id="@+id/tvCurrentScore"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:text="3"
-                        android:textColor="@color/colorNavy"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-                </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
-
-            <!-- Description (Indented to match title) -->
             <TextView
-                android:id="@+id/tvParamDesc"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="36dp"
-                android:layout_marginTop="4dp"
-                android:text="Depth of technical complexity and implementation quality."
-                android:textColor="@color/colorTextMuted"
-                android:textSize="11sp" />
+                android:layout_weight="1"
+                android:text="Poor"
+                style="@style/Capstone.Text.CardLabel" />
 
-            <!-- SeekBar Container -->
-            <SeekBar
-                android:id="@+id/sbScore"
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:max="3"
-                android:paddingStart="0dp"
-                android:paddingEnd="0dp"
-                android:progress="1"
-                android:progressTint="@color/colorNavy"
-                android:thumbTint="@color/colorGold" />
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Fair"
+                style="@style/Capstone.Text.CardLabel" />
 
-            <!-- Scale Labels -->
-            <LinearLayout
-                android:id="@+id/llScaleLabels"
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:orientation="horizontal">
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Good"
+                style="@style/Capstone.Text.CardLabel" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Poor"
-                    android:textColor="@color/colorTextMuted"
-                    android:textSize="9sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="Fair"
-                    android:textColor="@color/colorTextMuted"
-                    android:textSize="9sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="Good"
-                    android:textColor="@color/colorTextMuted"
-                    android:textSize="9sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:text="Excellent"
-                    android:textColor="@color/colorTextMuted"
-                    android:textSize="9sp" />
-            </LinearLayout>
-
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="Excellent"
+                style="@style/Capstone.Text.CardLabel" />
         </LinearLayout>
-    </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -1,319 +1,179 @@
-<!-- ═══ res/layout/activity_login.xml  (FIXED — no overlap) ═══ -->
+<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorNavyDark"
-    android:fillViewport="true"
-    android:scrollbars="none">
+    android:background="@color/colorOuterBg"
+    android:fillViewport="true">
 
-    <!--
-        FIX: Replaced ConstraintLayout root + guideline approach with a
-        simple LinearLayout inside ScrollView.
-        The negative-margin overlap trick now works reliably because the
-        white card is the NEXT sibling in the same LinearLayout, so
-        Android draws it on top of the header by default.
-        cardElevation="12dp" ensures the shadow and z-order are correct.
-    -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- ═══════════════════════════════════════════════════
-             TOP NAVY HEADER BLOCK
-             Fixed height = 240dp so it is always fully visible
-             before the white card overlaps from below.
-             ═══════════════════════════════════════════════════ -->
         <LinearLayout
             android:id="@+id/llHeader"
             android:layout_width="match_parent"
-            android:layout_height="240dp"
+            android:layout_height="220dp"
+            android:background="@color/colorTopBar"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingTop="32dp"
-            android:paddingBottom="40dp">
+            android:padding="24dp">
 
-            <!-- Decorative ring behind logo -->
-            <FrameLayout
-                android:layout_width="96dp"
-                android:layout_height="96dp">
-
-                <!-- Outer gold ring -->
-                <View
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
-                    android:background="@drawable/bg_badge_gold"
-                    android:alpha="0.35" />
-
-                <!-- Logo card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cvLogo"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:layout_gravity="center"
-                    app:cardBackgroundColor="@color/colorNavyLight"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="@color/colorGold"
-                    app:strokeWidth="1dp">
-
-                    <ImageView
-                        android:id="@+id/ivLogo"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_launcher_foreground"
-                        android:contentDescription="@string/app_name" />
-                </com.google.android.material.card.MaterialCardView>
-            </FrameLayout>
-
-            <!-- App name -->
-            <TextView
-                android:id="@+id/tvAppName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="@string/app_name"
-                android:textColor="@color/colorWhite"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.02" />
-
-            <!-- Subtitle -->
-            <TextView
-                android:id="@+id/tvSubtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/mpstme_nmims"
-                android:textColor="@color/colorTextMuted"
-                android:textSize="11sp" />
-
-            <!-- Gold divider line -->
-            <View
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="80dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="14dp"
-                android:background="@color/colorGold"
-                android:alpha="0.55" />
+                android:layout_height="80dp"
+                app:cardBackgroundColor="@color/colorCardBg"
+                app:cardCornerRadius="40dp"
+                app:cardElevation="8dp">
 
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="16dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_launcher_foreground" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/app_name"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold" />
         </LinearLayout>
-        <!-- END HEADER BLOCK -->
 
-
-        <!-- ═══════════════════════════════════════════════════
-             WHITE LOGIN CARD
-             marginTop="-28dp" slides the card 28dp up over the
-             navy header, creating the floating-card overlap.
-             cardElevation="16dp" guarantees it renders on top.
-             ═══════════════════════════════════════════════════ -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cvLoginForm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="-28dp"
-            app:cardBackgroundColor="@color/colorWhite"
-            app:cardCornerRadius="28dp"
-            app:cardElevation="16dp">
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="-30dp"
+            android:layout_marginBottom="24dp"
+            app:cardBackgroundColor="@color/colorCardBg"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="12dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingHorizontal="28dp"
-                android:paddingTop="32dp"
-                android:paddingBottom="32dp">
+                android:padding="24dp">
 
-                <!-- SECTION: Role Selection -->
                 <TextView
-                    android:id="@+id/tvSelectRole"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@string/title_login"
+                    style="@style/Capstone.Text.SectionHeader" />
+
+                <!-- Role Selection -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
                     android:text="@string/subtitle_select_role"
-                    android:textColor="@color/colorTextMuted"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.12" />
+                    style="@style/Capstone.Text.CardLabel"
+                    android:textStyle="bold" />
 
-                <!-- Role Tab Row -->
-                <LinearLayout
-                    android:id="@+id/llRoles"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="3dp">
-
-                    <!-- Student (active by default) -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnRoleStudent"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:text="@string/btn_student"
-                        android:textColor="@color/colorWhite"
-                        android:textSize="12sp"
-                        android:backgroundTint="@color/colorNavy"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        app:cornerRadius="9dp" />
-
-                    <!-- Mentor -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnRoleMentor"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:layout_marginHorizontal="2dp"
-                        android:text="@string/btn_mentor"
-                        android:textColor="@color/colorTextMuted"
-                        android:textSize="12sp"
-                        android:backgroundTint="@android:color/transparent"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        app:cornerRadius="9dp" />
-
-                    <!-- Admin -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnRoleAdmin"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:text="@string/btn_admin"
-                        android:textColor="@color/colorTextMuted"
-                        android:textSize="12sp"
-                        android:backgroundTint="@android:color/transparent"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        app:cornerRadius="9dp" />
-                </LinearLayout>
-
-                <!-- Thin full-width divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="24dp"
-                    android:background="@color/colorBorder" />
-
-                <!-- SECTION: Email -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilEmail"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/toggleRole"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="28dp"
-                    android:hint="@string/hint_email"
-                    app:boxStrokeColor="@color/colorNavy"
-                    app:boxCornerRadiusTopStart="10dp"
-                    app:boxCornerRadiusTopEnd="10dp"
-                    app:boxCornerRadiusBottomStart="10dp"
-                    app:boxCornerRadiusBottomEnd="10dp"
-                    app:hintTextColor="@color/colorNavy"
-                    app:startIconDrawable="@drawable/bg_navy_button"
-                    app:startIconTint="@color/colorNavy">
+                    android:layout_marginTop="8dp"
+                    app:singleSelection="true"
+                    app:checkedButton="@+id/btnStudent">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnStudent"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/btn_student"
+                        android:textSize="12sp"
+                        app:strokeColor="@color/colorLearningNavy" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnMentor"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/btn_mentor"
+                        android:textSize="12sp"
+                        app:strokeColor="@color/colorLearningNavy" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAdmin"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/btn_admin"
+                        android:textSize="12sp"
+                        app:strokeColor="@color/colorLearningNavy" />
+
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:hint="@string/hint_email">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etEmail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textEmailAddress"
-                        android:textColor="@color/colorTextPrimary"
-                        android:textSize="14sp" />
+                        android:inputType="textEmailAddress" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- SECTION: Password -->
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilPassword"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="16dp"
                     android:hint="@string/hint_password"
-                    app:boxStrokeColor="@color/colorNavy"
-                    app:boxCornerRadiusTopStart="10dp"
-                    app:boxCornerRadiusTopEnd="10dp"
-                    app:boxCornerRadiusBottomStart="10dp"
-                    app:boxCornerRadiusBottomEnd="10dp"
-                    app:hintTextColor="@color/colorNavy"
-                    app:startIconDrawable="@drawable/bg_navy_button"
-                    app:startIconTint="@color/colorNavy"
-                    app:endIconMode="password_toggle"
-                    app:endIconTint="@color/colorNavy">
+                    app:endIconMode="password_toggle">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPassword"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textPassword"
-                        android:textColor="@color/colorTextPrimary"
-                        android:textSize="14sp" />
+                        android:inputType="textPassword" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Forgot password -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLogin"
+                    style="@style/Widget.Capstone.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="32dp"
+                    android:text="@string/btn_sign_in" />
+
                 <TextView
                     android:id="@+id/tvForgotPassword"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_marginTop="10dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:padding="8dp"
                     android:text="@string/btn_forgot_password"
-                    android:textColor="@color/colorNavy"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:paddingVertical="4dp" />
-
-                <!-- SECTION: Sign In Button (with gold shimmer) -->
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_marginTop="28dp">
-
-                    <!-- Navy button body -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnLogin"
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:text="@string/btn_sign_in"
-                        android:textColor="@color/colorWhite"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:letterSpacing="0.08"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        app:backgroundTint="@color/colorNavy"
-                        app:cornerRadius="12dp" />
-
-                    <!-- Gold shimmer accent line at top of button -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:layout_gravity="top"
-                        android:layout_marginHorizontal="14dp"
-                        android:layout_marginTop="1dp"
-                        android:background="@color/colorGold"
-                        android:alpha="0.75" />
-                </FrameLayout>
-
-                <!-- Footer text -->
-                <TextView
-                    android:id="@+id/tvLoginFooter"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="28dp"
-                    android:gravity="center"
-                    android:text="@string/footer_text"
-                    android:textColor="@color/colorTextMuted"
-                    android:textSize="11sp" />
+                    style="@style/Capstone.Text.Muted" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-        <!-- END WHITE CARD -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="@string/footer_text"
+            style="@style/Capstone.Text.CardLabel" />
 
     </LinearLayout>
 </ScrollView>
