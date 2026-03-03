@@ -48,7 +48,7 @@
                     android:contentDescription="@string/app_name"
                     android:padding="8dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/logoc" />
+                    android:src="@drawable/logo" />
             </com.google.android.material.card.MaterialCardView>
         </FrameLayout>
 
