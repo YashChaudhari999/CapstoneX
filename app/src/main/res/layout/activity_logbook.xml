@@ -2,9 +2,11 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/logbook_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorOuterBg">
+    android:background="@color/colorOuterBg"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -36,129 +38,139 @@
                     android:id="@+id/tvProjectSubtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="AI Based Smart Surveillance System"
+                    android:text="AI Based Smart Surveillance"
                     android:textColor="#CCFFFFFF"
                     android:textSize="11sp" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorMainBg"
+        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- Stats Strip -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cvStats"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/Widget.Capstone.CardView">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_card_with_border"
-                android:baselineAligned="false"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:layout_marginBottom="16dp"
+                style="@style/Widget.Capstone.CardView">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
+                    android:background="@drawable/bg_card_with_border"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:baselineAligned="false">
 
-                    <TextView
-                        android:id="@+id/tvTotalEntries"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="12"
-                        android:textColor="@color/colorLearningNavy"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+                        <TextView
+                            android:id="@+id/tvTotalEntries"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="12"
+                            android:textColor="@color/colorLearningNavy"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Entries"
+                            style="@style/Capstone.Text.CardLabel" />
+                    </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/colorOuterBg"
+                        android:layout_marginVertical="4dp"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Entries"
-                        style="@style/Capstone.Text.CardLabel" />
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+                        <TextView
+                            android:id="@+id/tvSignedEntries"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="8"
+                            android:textColor="@color/colorAccentGreen"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Signed"
+                            style="@style/Capstone.Text.CardLabel" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/colorOuterBg"
+                        android:layout_marginVertical="4dp"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+                        <TextView
+                            android:id="@+id/tvPendingEntries"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="4"
+                            android:textColor="@color/colorAccentOrange"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pending"
+                            style="@style/Capstone.Text.CardLabel" />
+                    </LinearLayout>
                 </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="@color/colorOuterBg" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="RECENT LOGS"
+                style="@style/Capstone.Text.SectionHeader" />
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvLogEntries"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_logbook_entry" />
 
-                    <TextView
-                        android:id="@+id/tvSignedEntries"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="8"
-                        android:textColor="@color/colorAccentGreen"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+            <!-- Spacer to ensure content isn't hidden by FAB/Nav -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="100dp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Signed"
-                        style="@style/Capstone.Text.CardLabel" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="@color/colorOuterBg" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tvPendingEntries"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="4"
-                        android:textColor="@color/colorAccentOrange"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pending"
-                        style="@style/Capstone.Text.CardLabel" />
-                </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvLogEntries"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            android:clipToPadding="false"
-            android:paddingHorizontal="8dp"
-            android:paddingBottom="100dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cvStats"
-            tools:listitem="@layout/item_logbook_entry" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddEntry"
@@ -170,7 +182,8 @@
         android:src="@drawable/ic_plus"
         app:backgroundTint="@color/colorDashboardRed"
         app:elevation="6dp"
-        app:tint="#FFFFFF" />
+        app:tint="#FFFFFF"
+        android:contentDescription="Add New Log" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"

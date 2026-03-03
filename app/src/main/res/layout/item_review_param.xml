@@ -9,11 +9,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="16dp">
+        android:padding="16dp">
 
         <!-- Left Accent Stripe -->
         <View
-            android:id="@+id/vStripe"
+            android:id="@+id/vParamStripe"
             android:layout_width="4dp"
             android:layout_height="0dp"
             android:background="@color/colorLearningNavy"
@@ -21,23 +21,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Letter Indicator -->
         <TextView
             android:id="@+id/tvParamLetter"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
             android:background="@color/colorMainBg"
             android:gravity="center"
             android:text="A"
             android:textColor="@color/colorLearningNavy"
             android:textSize="14sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/vStripe"
+            app:layout_constraintStart_toEndOf="@id/vParamStripe"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Title -->
         <TextView
             android:id="@+id/tvParamTitle"
             android:layout_width="0dp"
@@ -51,13 +48,10 @@
             app:layout_constraintStart_toEndOf="@id/tvParamLetter"
             app:layout_constraintTop_toTopOf="@id/tvParamLetter" />
 
-        <!-- Current Score Display -->
         <TextView
             android:id="@+id/tvCurrentScore"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
             android:background="@color/colorMainBg"
             android:gravity="center"
             android:text="3"
@@ -67,7 +61,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Description -->
         <TextView
             android:id="@+id/tvParamDesc"
             android:layout_width="0dp"
@@ -75,11 +68,10 @@
             android:layout_marginTop="12dp"
             android:text="Depth of technical complexity and implementation quality."
             style="@style/Capstone.Text.Muted"
-            app:layout_constraintEnd_toEndOf="@id/tvCurrentScore"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/tvParamLetter"
             app:layout_constraintTop_toBottomOf="@id/tvParamLetter" />
 
-        <!-- SeekBar -->
         <SeekBar
             android:id="@+id/sbScore"
             android:layout_width="0dp"
@@ -91,13 +83,11 @@
             android:progress="1"
             android:progressTint="@color/colorDashboardRed"
             android:thumbTint="@color/colorAccentYellow"
-            app:layout_constraintEnd_toEndOf="@id/tvCurrentScore"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/tvParamLetter"
             app:layout_constraintTop_toBottomOf="@id/tvParamDesc" />
 
-        <!-- SeekBar Labels -->
         <LinearLayout
-            android:id="@+id/llLabels"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"

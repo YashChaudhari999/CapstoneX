@@ -23,5 +23,18 @@
     <color name="colorAccentTeal">#0B9E8A</color>
     <color name="colorAccentOrange">#FD7E14</color>
 
+    <!-- Compatibility Aliases for legacy files -->
+    <color name="colorNavy">#1C3D58</color>
+    <color name="colorNavyDark">#7A0C0C</color>
+    <color name="colorNavyLight">#EFEFEF</color>
+    <color name="colorGold">#F5C518</color>
+    <color name="colorGoldLight">#FFF9E6</color>
+    <color name="colorGreen">#28A745</color>
+    <color name="colorGreenBg">#E6F4EA</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBackground">#EFEFEF</color>
+    <color name="colorBorder">#DCDCDC</color>
+    <color name="colorTextMuted">#888888</color>
+
     <color name="white">#FFFFFF</color>
 </resources>
