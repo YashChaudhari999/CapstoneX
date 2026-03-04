@@ -11,7 +11,7 @@ public class AdminDashboardActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_dashboard);
-        applySystemWindowInsets(findViewById(android.R.id.content));
+        setupEdgeToEdge(findViewById(R.id.admin_drawer_layout));
 
         Toolbar toolbar = findViewById(R.id.admin_toolbar);
         setSupportActionBar(toolbar);

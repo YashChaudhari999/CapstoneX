@@ -11,7 +11,7 @@ public class MentorDashboardActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mentor_dashboard);
-        applySystemWindowInsets(findViewById(android.R.id.content));
+        setupEdgeToEdge(findViewById(android.R.id.content));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

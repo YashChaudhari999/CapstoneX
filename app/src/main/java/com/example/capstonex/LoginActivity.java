@@ -11,7 +11,7 @@ public class LoginActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        applySystemWindowInsets(findViewById(android.R.id.content));
+        setupEdgeToEdge(findViewById(android.R.id.content));
 
         MaterialButton btnLogin = findViewById(R.id.btnLogin);
         MaterialButtonToggleGroup toggleRole = findViewById(R.id.toggleRole);

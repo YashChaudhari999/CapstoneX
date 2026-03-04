@@ -7,6 +7,6 @@ public class RegistrationActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
-        applySystemWindowInsets(findViewById(android.R.id.content));
+        setupEdgeToEdge(findViewById(android.R.id.content));
     }
 }

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorOuterBg">
+    android:background="@color/colorOuterBg"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -25,10 +26,14 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cvToolbarProfile"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     app:cardCornerRadius="20dp"
-                    app:cardElevation="2dp">
+                    app:cardElevation="2dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
                         android:layout_width="match_parent"
@@ -62,6 +67,8 @@
                     android:background="@drawable/ic_launcher_background"
                     android:padding="6dp"
                     android:src="@drawable/ic_bell"
+                    android:clickable="true"
+                    android:focusable="true"
                     app:tint="@color/colorAccentYellow" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
@@ -93,12 +100,16 @@
                 android:columnCount="2"
                 android:rowCount="2">
 
-                <!-- Courses Tile -->
+                <!-- Timeline Tile -->
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tileTimeline"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
-                    style="@style/Widget.Capstone.CardView">
+                    style="@style/Widget.Capstone.CardView"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -115,7 +126,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_book"
+                                android:src="@drawable/ic_calendar"
                                 app:tint="#FFFFFF" />
                         </FrameLayout>
 
@@ -123,17 +134,21 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Courses"
+                            android:text="Timeline"
                             style="@style/Capstone.Text.Body" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Feedback Tile -->
+                <!-- Documents Tile -->
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tileDocuments"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
-                    style="@style/Widget.Capstone.CardView">
+                    style="@style/Widget.Capstone.CardView"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -150,7 +165,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_checklist"
+                                android:src="@drawable/ic_book"
                                 app:tint="#FFFFFF" />
                         </FrameLayout>
 
@@ -158,17 +173,21 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Feedback"
+                            android:text="Documents"
                             style="@style/Capstone.Text.Body" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Attendance Tile -->
+                <!-- Chat Tile -->
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tileChat"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
-                    style="@style/Widget.Capstone.CardView">
+                    style="@style/Widget.Capstone.CardView"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -193,17 +212,21 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Attendance"
+                            android:text="Chat"
                             style="@style/Capstone.Text.Body" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Warnings Tile -->
+                <!-- Plagiarism Tile -->
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tilePlagiarism"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
-                    style="@style/Widget.Capstone.CardView">
+                    style="@style/Widget.Capstone.CardView"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -220,7 +243,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_bell"
+                                android:src="@drawable/ic_checklist"
                                 app:tint="#FFFFFF" />
                         </FrameLayout>
 
@@ -228,13 +251,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Warnings"
+                            android:text="Plagiarism"
                             style="@style/Capstone.Text.Body" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </GridLayout>
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardProgress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"

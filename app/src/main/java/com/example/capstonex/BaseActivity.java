@@ -17,7 +17,19 @@ public abstract class BaseActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
     }
 
+    /**
+     * Standard method to handle window insets.
+     * Renamed to handle various references in different activity files.
+     */
     protected void applySystemWindowInsets(View rootView) {
+        setupEdgeToEdge(rootView);
+    }
+
+    /**
+     * Alias for applySystemWindowInsets to ensure all activities compile.
+     */
+    protected void setupEdgeToEdge(View rootView) {
+        if (rootView == null) return;
         ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
