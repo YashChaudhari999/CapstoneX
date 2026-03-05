@@ -17,7 +17,10 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="95dp"
+            android:minHeight="?attr/actionBarSize"
+            android:paddingTop="35dp"
+            android:layout_marginBottom="1dp"
             app:navigationIcon="@drawable/ic_back"
             app:navigationIconTint="#FFFFFF">
 
@@ -42,11 +45,11 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             style="@style/Widget.Capstone.CardView">
-            
+
             <com.prolificinteractive.materialcalendarview.MaterialCalendarView
                 android:id="@+id/calendarView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 app:mcv_selectionColor="@color/colorDashboardRed"
                 app:mcv_showOtherDates="all" />
         </com.google.android.material.card.MaterialCardView>

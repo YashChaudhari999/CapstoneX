@@ -23,7 +23,9 @@
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/admin_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
+                android:layout_height="95dp"
+                android:paddingTop="35dp"
+                android:layout_margin="1dp"
                 app:navigationIcon="@drawable/ic_menu"
                 app:navigationIconTint="#FFFFFF">
 
