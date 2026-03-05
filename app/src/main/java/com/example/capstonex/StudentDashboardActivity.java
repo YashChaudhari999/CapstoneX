@@ -2,6 +2,7 @@ package com.example.capstonex;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class StudentDashboardActivity extends BaseActivity {
@@ -17,14 +18,28 @@ public class StudentDashboardActivity extends BaseActivity {
 
         bottomNavigation.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_logbook) {
-                navigateTo(LogbookActivity.class);
+            if (id == R.id.nav_home) {
+//                navigateTo(StudentDashboardActivity.class);
+//                Intent intent = new Intent(this, StudentDashboardActivity.class);
+//                startActivity(intent);
+                return true;
+            } else if (id == R.id.nav_logbook) {
+//                navigateTo(LogbookActivity.class);
+                Intent intent = new Intent(this, LogbookActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
                 return true;
             } else if (id == R.id.nav_reviews) {
-                navigateTo(MyMarksActivity.class);
+//                navigateTo(MyMarksActivity.class);
+                Intent intent = new Intent(this, MyMarksActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
                 return true;
             } else if (id == R.id.nav_profile) {
-                navigateTo(ProfileActivity.class);
+//                navigateTo(ProfileActivity.class);
+                Intent intent = new Intent(this, ProfileActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
                 return true;
             }
             return true;

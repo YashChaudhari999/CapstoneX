@@ -18,6 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorTopBar"
+            android:layout_marginTop="@dimen/_20sdp"
             app:elevation="4dp">
 
             <androidx.appcompat.widget.Toolbar
@@ -27,6 +28,7 @@
                 android:paddingTop="35dp"
                 android:layout_margin="1dp"
                 app:navigationIcon="@drawable/ic_menu"
+                android:layout_marginTop="@dimen/_20sdp"
                 app:navigationIconTint="#FFFFFF">
 
                 <TextView
@@ -72,13 +74,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
                     android:text="SYSTEM OVERVIEW"
                     style="@style/Capstone.Text.SectionHeader" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:paddingBottom="15dp"
+                    android:layout_height="250dp">
 
                     <!-- 142 Groups -->
                     <com.google.android.material.card.MaterialCardView
