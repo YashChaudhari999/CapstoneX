@@ -18,15 +18,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorTopBar"
-            android:layout_marginTop="@dimen/_20sdp"
             app:elevation="4dp">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/admin_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="95dp"
+                android:layout_height="wrap_content"
                 android:paddingTop="35dp"
                 android:layout_margin="1dp"
+                android:minHeight="?attr/actionBarSize"
                 app:navigationIcon="@drawable/ic_menu"
                 android:layout_marginTop="@dimen/_20sdp"
                 app:navigationIconTint="#FFFFFF">

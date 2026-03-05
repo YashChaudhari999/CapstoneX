@@ -2,9 +2,11 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/student_dashboard_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorOuterBg">
+    android:background="@color/colorOuterBg"
+    android:fitsSystemWindows="false">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -18,8 +20,9 @@
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize"
             android:paddingTop="35dp"
-            android:layout_marginBottom="10dp"
-            app:contentInsetStart="16dp">
+            android:layout_marginBottom="1dp"
+            app:navigationIcon="@drawable/ic_menu"
+            app:navigationIconTint="#FFFFFF">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -55,7 +58,7 @@
                         android:id="@+id/tvStudentName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Student Name"
+                        android:text="Student Dashboard"
                         android:textColor="#FFFFFF"
                         android:textSize="18sp"
                         android:textStyle="bold" />

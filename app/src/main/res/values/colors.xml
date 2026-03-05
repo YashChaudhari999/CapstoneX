@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Primary Brand Colors -->
-    <color name="colorTopBar">#7A0C0C</color>
+    <color name="colorTopBar">#8B0000</color>
     <color name="colorDashboardRed">#9B1B1B</color>
     <color name="colorLearningNavy">#1C3D58</color>
     <color name="colorSidebarBg">#2B2B2B</color>
@@ -25,7 +25,7 @@
 
     <!-- Compatibility Aliases for legacy files -->
     <color name="colorNavy">#1C3D58</color>
-    <color name="colorNavyDark">#7A0C0C</color>
+    <color name="colorNavyDark">#8B0000</color>
     <color name="colorNavyLight">#EFEFEF</color>
     <color name="colorGold">#F5C518</color>
     <color name="colorGoldLight">#FFF9E6</color>
