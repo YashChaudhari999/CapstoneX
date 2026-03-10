@@ -21,7 +21,7 @@ public class AddLogActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_add_log_entry);
-
+        getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.colorTopBar));
 //        Toolbar toolbar = findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
 //        if (getSupportActionBar() != null) {
