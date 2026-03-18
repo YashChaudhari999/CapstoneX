@@ -12,28 +12,34 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 /**
- * AdminDashboardActivity — CapstonX (Fixed)
+ * AdminDashboardActivity — CapstonX
  * <p>
- * FIX — onError() callback now shows an AlertDialog with the exact
- * reason the import failed (e.g. "Email/Password sign-in not
- * enabled in Firebase Console") instead of silently doing nothing.
+ * FIX: Removed ALL Firestore references.
+ * loadOverviewCounts() now reads from Realtime DB → Users node,
+ * filtering by role = "mentor" for mentor count,
+ * and reading Groups node for group count.
  * <p>
- * Every per-row error is also shown in both the ProgressDialog and the
- * inline status TextView below the button, so the admin can see exactly
- * which rows failed and why.
+ * This eliminates the Firestore WriteStream NOT_FOUND errors.
  */
 public class AdminDashboardActivity extends BaseActivity {
 
     private static final String TAG = "AdminDashboard";
+    private static final String DB_URL =
+            "https://capstonex-8b885-default-rtdb.firebaseio.com";
     private static final int REQ_PICK_STUDENTS = 101;
     private static final int REQ_PICK_MENTORS = 102;
 
@@ -43,8 +49,9 @@ public class AdminDashboardActivity extends BaseActivity {
     private TextView tvStudentImportStatus, tvMentorImportStatus;
     private TextView tvGroupCount, tvMentorCount;
 
-    // ── Firebase ───────────────────────────────────────────────────────────
-    private FirebaseFirestore db;
+    // ── Firebase — Realtime DB only, no Firestore ──────────────────────────
+    private DatabaseReference usersRef;
+    private DatabaseReference groupsRef;
     private UserImportHelper importHelper;
 
     // ── Progress dialog ────────────────────────────────────────────────────
@@ -56,7 +63,11 @@ public class AdminDashboardActivity extends BaseActivity {
         setContentView(R.layout.activity_admin_dashboard);
         setupEdgeToEdge(findViewById(R.id.admin_drawer_layout));
 
-        db = FirebaseFirestore.getInstance();
+        // ── Realtime DB refs (explicit URL — no Firestore) ─────────────────
+        FirebaseDatabase realtimeDb = FirebaseDatabase.getInstance(DB_URL);
+        usersRef = realtimeDb.getReference().child("Users");
+        groupsRef = realtimeDb.getReference().child("Groups");
+
         importHelper = new UserImportHelper(this);
 
         // ── Progress dialog ────────────────────────────────────────────────
@@ -123,7 +134,6 @@ public class AdminDashboardActivity extends BaseActivity {
         if (resultCode != RESULT_OK || data == null || data.getData() == null) return;
 
         Uri fileUri = data.getData();
-
         if (requestCode == REQ_PICK_STUDENTS) {
             startImport(fileUri, "student",
                     btnAddStudents, progressStudents, tvStudentImportStatus);
@@ -133,7 +143,7 @@ public class AdminDashboardActivity extends BaseActivity {
         }
     }
 
-    // ── Core import ───────────────────────────────────────────────────────
+    // ── Import ────────────────────────────────────────────────────────────
     private void startImport(Uri fileUri, String role,
                              MaterialButton button,
                              ProgressBar progressBar,
@@ -149,7 +159,6 @@ public class AdminDashboardActivity extends BaseActivity {
 
         importHelper.importFromFile(fileUri, role, new UserImportHelper.ImportCallback() {
 
-            // ── Per-row progress ──────────────────────────────────────────
             @Override
             public void onRowProcessed(int done, int total,
                                        String email, boolean success, String error) {
@@ -164,7 +173,6 @@ public class AdminDashboardActivity extends BaseActivity {
                 statusText.setText(detail);
             }
 
-            // ── All rows done ─────────────────────────────────────────────
             @Override
             public void onComplete(int succeeded, int failed, int total) {
                 dismissProgress();
@@ -180,22 +188,21 @@ public class AdminDashboardActivity extends BaseActivity {
                         succeeded + " " + role + "(s) added successfully!",
                         Toast.LENGTH_LONG).show();
 
-                // If some rows failed, show a hint
                 if (failed > 0) {
                     showInfoDialog("Some rows failed",
                             failed + " row(s) could not be imported.\n\n" +
-                                    "Most common reasons:\n" +
-                                    "• Email/Password sign-in is NOT enabled in Firebase Console\n" +
-                                    "  → Authentication → Sign-in methods → Email/Password → Enable\n\n" +
-                                    "• Email already registered\n" +
-                                    "• Password shorter than 6 characters\n\n" +
-                                    "Check Logcat (tag: UserImportHelper) for per-row details.");
+                                    "Common reasons:\n" +
+                                    "• Email already registered in Firebase Auth\n" +
+                                    "  → Delete from Firebase Console → Authentication\n\n" +
+                                    "• Password shorter than 6 characters\n" +
+                                    "• Invalid email format\n\n" +
+                                    "Check Logcat (tag: UserImportHelper) for details.");
                 }
 
+                // Refresh overview cards from Realtime DB
                 loadOverviewCounts();
             }
 
-            // ── File-level error (can't read, Firebase config issue, etc.) ─
             @Override
             public void onError(String error) {
                 dismissProgress();
@@ -203,33 +210,57 @@ public class AdminDashboardActivity extends BaseActivity {
                 progressBar.setVisibility(View.GONE);
                 statusText.setText("Import failed");
                 Log.e(TAG, "Import error: " + error);
-
                 showInfoDialog("Import Failed", error);
             }
         });
     }
 
-    // ── Helper: dismiss progress dialog safely ────────────────────────────
+    // ── Load overview counts from Realtime DB ─────────────────────────────
+    // FIX: Reads Users node filtered by role="mentor" for mentor count
+    //      and Groups node for group count — NO Firestore calls
+    private void loadOverviewCounts() {
+
+        // ── Mentor count ───────────────────────────────────────────────────
+        usersRef.orderByChild("role").equalTo("mentor")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        tvMentorCount.setText(snapshot.getChildrenCount() + " Mentors");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e(TAG, "Mentor count error: " + error.getMessage());
+                    }
+                });
+
+        // ── Group count ────────────────────────────────────────────────────
+        groupsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                tvGroupCount.setText(snapshot.getChildrenCount() + " Groups");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Group count error: " + error.getMessage());
+                tvGroupCount.setText("0 Groups");
+            }
+        });
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────
     private void dismissProgress() {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
     }
 
-    // ── Helper: show an AlertDialog with a message ────────────────────────
     private void showInfoDialog(String title, String message) {
         new AlertDialog.Builder(this)
                 .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton("OK", null)
                 .show();
-    }
-
-    // ── Live counts ───────────────────────────────────────────────────────
-    private void loadOverviewCounts() {
-        db.collection("users").whereEqualTo("role", "mentor").get()
-                .addOnSuccessListener(s -> tvMentorCount.setText(s.size() + " Mentors"));
-        db.collection("groups").get()
-                .addOnSuccessListener(s -> tvGroupCount.setText(s.size() + " Groups"));
     }
 }

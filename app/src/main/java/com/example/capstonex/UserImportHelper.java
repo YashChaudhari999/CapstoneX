@@ -6,12 +6,12 @@ import android.util.Log;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -22,40 +22,51 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
- * UserImportHelper — CapstonX (Fixed)
+ * UserImportHelper — CapstonX
+ * Firebase Auth + Realtime Database
  * <p>
- * CSV Format (5 columns, header row optional):
- * email,password,name,sapId,photoUrl
+ * FIX: Explicitly pass the Realtime DB URL so Firebase connects correctly.
+ * Without this, FirebaseDatabase.getInstance() may silently fail to
+ * resolve the database and writes never reach the server.
  * <p>
- * FIX 1 — Exception in importFromFile now calls callback.onError() instead
- * of silently swallowing the error, so the UI is never left stuck.
+ * DB URL: https://capstonex-8b885-default-rtdb.firebaseio.com
  * <p>
- * FIX 2 — Firebase Auth errors are now fully surfaced per-row with the
- * exact message (e.g. "Email/Password auth not enabled in Firebase
- * Console", "Network error", "Email already registered").
- * <p>
- * FIX 3 — CountDownLatch timeout added (30s per row) so a hung Firebase
- * call never freezes the import thread forever.
- * <p>
- * FIX 4 — Removed java.util.function.Consumer (requires API 24+).
- * Replaced with a local Callback interface — safe on all API levels.
+ * ── Realtime DB structure ─────────────────────────────────────────────────
+ * Users/{uid}/
+ * uid, email, role, name, sapId,
+ * profileImageUrl, status, fcmToken, createdAt, createdBy
  */
 public class UserImportHelper {
 
     private static final String TAG = "UserImportHelper";
     private static final String SECONDARY_APP = "capstonex_importer";
+
+    // ── YOUR Realtime DB URL — explicit so Firebase always connects ────────
+    private static final String DB_URL =
+            "https://capstonex-8b885-default-rtdb.firebaseio.com";
+
     private static final String DEFAULT_AVATAR =
             "https://ui-avatars.com/api/?background=7B1C2E&color=fff&size=128&name=User";
     private static final String EMAIL_PATTERN =
             "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
     private final Context context;
-    private final FirebaseFirestore db;
+    private final DatabaseReference usersRef;
 
     public UserImportHelper(Context context) {
         this.context = context.getApplicationContext();
-        this.db = FirebaseFirestore.getInstance();
+
+        // ── FIX: Pass DB URL explicitly ────────────────────────────────────
+        // FirebaseDatabase.getInstance() alone doesn't always resolve the URL.
+        // Using getInstance(url) guarantees the correct database is targeted.
+        this.usersRef = FirebaseDatabase
+                .getInstance(DB_URL)
+                .getReference()
+                .child("Users");
+
+        Log.d(TAG, "Realtime DB ref initialised → " + DB_URL + "/Users");
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -67,26 +78,21 @@ public class UserImportHelper {
                     new android.os.Handler(android.os.Looper.getMainLooper());
             try {
                 List<UserRow> rows = parseCsv(fileUri);
-
                 Log.d(TAG, "Parsed " + rows.size() + " rows from CSV");
 
                 if (rows.isEmpty()) {
                     main.post(() -> callback.onError(
-                            "No valid rows found in file.\n" +
-                                    "Expected format: email,password,name,sapId,photoUrl\n" +
-                                    "Make sure the file has at least 4 columns per row."));
+                            "No valid rows found.\n" +
+                                    "Expected: email,password,name,sapId,photoUrl"));
                     return;
                 }
 
-                // Check if Email/Password sign-in is enabled — do a quick test
-                // by checking secondary auth initialisation
                 FirebaseAuth secondaryAuth;
                 try {
                     secondaryAuth = getSecondaryAuth();
                 } catch (Exception e) {
                     main.post(() -> callback.onError(
-                            "Firebase setup error: " + e.getMessage() + "\n" +
-                                    "Make sure google-services.json is present."));
+                            "Firebase setup error: " + e.getMessage()));
                     return;
                 }
 
@@ -94,7 +100,6 @@ public class UserImportHelper {
 
             } catch (Exception e) {
                 Log.e(TAG, "Import error: " + e.getMessage(), e);
-                // FIX 1 — always call back so UI is never stuck
                 main.post(() -> callback.onError(
                         "Failed to read file: " + e.getMessage()));
             }
@@ -108,7 +113,7 @@ public class UserImportHelper {
         List<UserRow> rows = new ArrayList<>();
 
         InputStream is = context.getContentResolver().openInputStream(fileUri);
-        if (is == null) throw new Exception("Cannot open file — check file permissions");
+        if (is == null) throw new Exception("Cannot open file — check permissions");
 
         BufferedReader reader =
                 new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
@@ -119,8 +124,7 @@ public class UserImportHelper {
 
         while ((line = reader.readLine()) != null) {
             lineNum++;
-            // Strip BOM (Excel sometimes adds \uFEFF at start of CSV)
-            if (firstLine) line = line.replace("\uFEFF", "");
+            if (firstLine) line = line.replace("\uFEFF", ""); // strip Excel BOM
             line = line.trim();
             if (line.isEmpty()) continue;
 
@@ -134,8 +138,8 @@ public class UserImportHelper {
 
             String[] cols = line.split(",", -1);
             if (cols.length < 4) {
-                Log.w(TAG, "Row " + lineNum + " skipped — only " +
-                        cols.length + " column(s): " + line);
+                Log.w(TAG, "Row " + lineNum + " skipped — only "
+                        + cols.length + " col(s): " + line);
                 continue;
             }
 
@@ -143,7 +147,6 @@ public class UserImportHelper {
             String password = cols[1].trim();
             String name = cols[2].trim();
             String sapId = cols[3].trim();
-            // photoUrl may contain commas inside a URL — rejoin remaining cols
             String photoUrl = cols.length >= 5 ? cols[4].trim() : "";
 
             rows.add(new UserRow(email, password, name, sapId, photoUrl));
@@ -170,14 +173,14 @@ public class UserImportHelper {
             UserRow row = rows.get(i);
             final int pos = i + 1;
 
-            Log.d(TAG, "Processing row " + pos + "/" + total + " → " + row.email);
+            Log.d(TAG, "Processing " + pos + "/" + total + " → " + row.email);
 
             // ── Step 1: Validate ──────────────────────────────────────────
             String validationError = validate(row);
             if (validationError != null) {
                 failed++;
-                Log.w(TAG, "Validation failed for " + row.email + ": " + validationError);
                 final String err = validationError;
+                Log.w(TAG, "Validation failed: " + err);
                 main.post(() -> callback.onRowProcessed(
                         pos, total, row.email, false, err));
                 continue;
@@ -186,18 +189,17 @@ public class UserImportHelper {
             // ── Step 2: Firebase Auth (secondary app) ─────────────────────
             final boolean[] rowSuccess = {false};
             final String[] rowError = {null};
-            // FIX 3 — 30s timeout so a hung call never freezes the loop
             CountDownLatch latch = new CountDownLatch(1);
 
             secondaryAuth
                     .createUserWithEmailAndPassword(row.email, row.password)
                     .addOnSuccessListener(authResult -> {
                         String uid = authResult.getUser().getUid();
-                        Log.d(TAG, "Auth account created for " + row.email + " uid=" + uid);
+                        Log.d(TAG, "✓ Auth created: " + row.email + " uid=" + uid);
                         secondaryAuth.signOut();
 
-                        // ── Step 3: Save to Firestore ─────────────────────────
-                        saveToFirestore(uid, row, role,
+                        // ── Step 3: Save to Realtime DB ───────────────────────
+                        saveToRealtimeDB(uid, row, role,
                                 () -> {
                                     rowSuccess[0] = true;
                                     latch.countDown();
@@ -209,7 +211,6 @@ public class UserImportHelper {
                         );
                     })
                     .addOnFailureListener(e -> {
-                        // FIX 2 — surface the exact Firebase Auth error
                         if (e instanceof FirebaseAuthUserCollisionException) {
                             rowError[0] = "Email already registered";
                         } else if (e instanceof FirebaseAuthWeakPasswordException) {
@@ -217,22 +218,18 @@ public class UserImportHelper {
                         } else if (e instanceof FirebaseAuthInvalidCredentialsException) {
                             rowError[0] = "Invalid email format";
                         } else {
-                            // This often means Email/Password auth is NOT enabled
-                            // in Firebase Console → Authentication → Sign-in methods
                             rowError[0] = e.getMessage();
-                            Log.e(TAG, "Auth FAILED for " + row.email
-                                    + " | Error class: " + e.getClass().getSimpleName()
-                                    + " | Message: " + e.getMessage());
+                            Log.e(TAG, "✗ Auth FAILED: " + row.email
+                                    + " | " + e.getClass().getSimpleName()
+                                    + " | " + e.getMessage());
                         }
                         latch.countDown();
                     });
 
             try {
-                // FIX 3 — 30s timeout per row
-                boolean finished = latch.await(30, java.util.concurrent.TimeUnit.SECONDS);
-                if (!finished) {
+                if (!latch.await(30, TimeUnit.SECONDS)) {
                     rowError[0] = "Timeout — check internet connection";
-                    Log.e(TAG, "Latch timed out for " + row.email);
+                    Log.e(TAG, "Timeout for " + row.email);
                 }
             } catch (InterruptedException ignored) {
             }
@@ -244,8 +241,7 @@ public class UserImportHelper {
             } else {
                 failed++;
                 final String err = rowError[0] != null
-                        ? rowError[0]
-                        : "Unknown error — check Logcat for tag UserImportHelper";
+                        ? rowError[0] : "Unknown error";
                 main.post(() -> callback.onRowProcessed(
                         pos, total, row.email, false, err));
             }
@@ -263,42 +259,45 @@ public class UserImportHelper {
         if (row.password.isEmpty()) return "Password is empty";
         if (row.name.isEmpty()) return "Name is empty";
         if (row.sapId.isEmpty()) return "SAP ID is empty";
-        if (!row.email.matches(EMAIL_PATTERN)) return "Invalid email: " + row.email;
+        if (!row.email.matches(EMAIL_PATTERN))
+            return "Invalid email: " + row.email;
         if (row.password.length() < 6)
-            return "Password too short (min 6 chars): " + row.password;
+            return "Password too short (min 6 chars)";
         return null;
     }
 
     // ─────────────────────────────────────────────────────────────────────
-    // Save to Firestore
+    // Save to Realtime DB → Users/{uid}
     // ─────────────────────────────────────────────────────────────────────
-    private void saveToFirestore(String uid, UserRow row, String role,
-                                 Runnable onSuccess, StringConsumer onFailure) {
+    private void saveToRealtimeDB(String uid, UserRow row, String role,
+                                  Runnable onSuccess, StringConsumer onFailure) {
 
         String finalPhoto = (row.photoUrl == null || row.photoUrl.isEmpty())
                 ? DEFAULT_AVATAR : row.photoUrl;
 
-        Map<String, Object> userDoc = new HashMap<>();
-        userDoc.put("uid", uid);
-        userDoc.put("email", row.email);
-        userDoc.put("role", role);
-        userDoc.put("name", row.name);
-        userDoc.put("sapId", row.sapId);
-        userDoc.put("profileImageUrl", finalPhoto);
-        userDoc.put("status", "active");
-        userDoc.put("fcmToken", "");
-        userDoc.put("createdAt", Timestamp.now());
-        userDoc.put("createdBy", "admin_import");
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("uid", uid);
+        userMap.put("email", row.email);
+        userMap.put("role", role);            // "student" | "mentor"
+        userMap.put("name", row.name);
+        userMap.put("sapId", row.sapId);
+        userMap.put("profileImageUrl", finalPhoto);
+        userMap.put("status", "active");
+        userMap.put("fcmToken", "");
+        userMap.put("createdAt", System.currentTimeMillis());
+        userMap.put("createdBy", "admin_import");
 
-        db.collection("users").document(uid)
-                .set(userDoc)
+        Log.d(TAG, "Saving to Realtime DB: Users/" + uid);
+
+        usersRef.child(uid).setValue(userMap)
                 .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "Firestore saved for uid=" + uid);
+                    Log.d(TAG, "✓ Realtime DB saved: Users/" + uid);
                     onSuccess.run();
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Firestore save failed for uid=" + uid + ": " + e.getMessage());
-                    onFailure.accept("Auth OK but Firestore save failed: " + e.getMessage());
+                    Log.e(TAG, "✗ Realtime DB FAILED: Users/" + uid
+                            + " | " + e.getMessage());
+                    onFailure.accept("Auth OK but DB save failed: " + e.getMessage());
                 });
     }
 
@@ -317,26 +316,16 @@ public class UserImportHelper {
         return FirebaseAuth.getInstance(secondaryApp);
     }
 
-    // ── Callbacks ─────────────────────────────────────────────────────────
+    // ── Callback interface ─────────────────────────────────────────────────
     public interface ImportCallback {
-        /**
-         * Fired after every row — success or failure
-         */
         void onRowProcessed(int done, int total,
                             String email, boolean success, String error);
 
-        /**
-         * Fired when entire file is done
-         */
         void onComplete(int succeeded, int failed, int total);
 
-        /**
-         * Fired if the file itself can't be read / parsed
-         */
         void onError(String error);
     }
 
-    // Simple string consumer — avoids java.util.function (API 24+)
     private interface StringConsumer {
         void accept(String value);
     }
