@@ -24,11 +24,11 @@
                 android:id="@+id/admin_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="1dp"
-                android:layout_marginTop="@dimen/_20sdp"
-                android:minHeight="?attr/actionBarSize"
                 android:paddingTop="35dp"
+                android:layout_margin="1dp"
+                android:minHeight="?attr/actionBarSize"
                 app:navigationIcon="@drawable/ic_menu"
+                android:layout_marginTop="@dimen/_20sdp"
                 app:navigationIconTint="#FFFFFF">
 
                 <TextView
@@ -71,41 +71,38 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- ── System Overview Cards ─────────────────────────── -->
                 <TextView
-                    style="@style/Capstone.Text.SectionHeader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="SYSTEM OVERVIEW" />
+                    android:text="SYSTEM OVERVIEW"
+                    style="@style/Capstone.Text.SectionHeader" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    android:paddingBottom="15dp">
+                    android:paddingBottom="15dp"
+                    android:layout_height="250dp">
 
+                    <!-- 142 Groups -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardGroups"
-                        style="@style/Widget.Capstone.CardView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         app:layout_constraintEnd_toStartOf="@+id/cardMentors"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
+                        app:layout_constraintTop_toTopOf="parent"
+                        style="@style/Widget.Capstone.CardView">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:orientation="vertical"
                             android:padding="16dp">
-
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="48dp"
                                 android:layout_height="48dp"
                                 app:cardBackgroundColor="@color/colorAccentBlue"
                                 app:cardCornerRadius="24dp"
                                 app:cardElevation="0dp">
-
                                 <ImageView
                                     android:layout_width="24dp"
                                     android:layout_height="24dp"
@@ -113,40 +110,36 @@
                                     android:src="@drawable/ic_checklist"
                                     app:tint="#FFFFFF" />
                             </com.google.android.material.card.MaterialCardView>
-
                             <TextView
-                                android:id="@+id/tvGroupCount"
-                                style="@style/Capstone.Text.Body"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="— Groups" />
+                                android:text="142 Groups"
+                                style="@style/Capstone.Text.Body" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- 12 Mentors -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardMentors"
-                        style="@style/Widget.Capstone.CardView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/cardGroups"
-                        app:layout_constraintTop_toTopOf="parent">
-
+                        app:layout_constraintTop_toTopOf="parent"
+                        style="@style/Widget.Capstone.CardView">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:orientation="vertical"
                             android:padding="16dp">
-
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="48dp"
                                 android:layout_height="48dp"
                                 app:cardBackgroundColor="@color/colorAccentTeal"
                                 app:cardCornerRadius="24dp"
                                 app:cardElevation="0dp">
-
                                 <ImageView
                                     android:layout_width="24dp"
                                     android:layout_height="24dp"
@@ -154,41 +147,37 @@
                                     android:src="@drawable/ic_person"
                                     app:tint="#FFFFFF" />
                             </com.google.android.material.card.MaterialCardView>
-
                             <TextView
-                                android:id="@+id/tvMentorCount"
-                                style="@style/Capstone.Text.Body"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="— Mentors" />
+                                android:text="12 Mentors"
+                                style="@style/Capstone.Text.Body" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- High Attendance -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardAttendance"
-                        style="@style/Widget.Capstone.CardView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         app:layout_constraintEnd_toStartOf="@+id/cardCritical"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/cardGroups">
-
+                        app:layout_constraintTop_toBottomOf="@id/cardGroups"
+                        style="@style/Widget.Capstone.CardView">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:orientation="vertical"
                             android:padding="16dp">
-
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="48dp"
                                 android:layout_height="48dp"
                                 app:cardBackgroundColor="@color/colorAccentGreen"
                                 app:cardCornerRadius="24dp"
                                 app:cardElevation="0dp">
-
                                 <ImageView
                                     android:layout_width="24dp"
                                     android:layout_height="24dp"
@@ -196,40 +185,37 @@
                                     android:src="@drawable/ic_checklist"
                                     app:tint="#FFFFFF" />
                             </com.google.android.material.card.MaterialCardView>
-
                             <TextView
-                                style="@style/Capstone.Text.Body"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="High Attendance" />
+                                android:text="High Attendance"
+                                style="@style/Capstone.Text.Body" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- Critical -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardCritical"
-                        style="@style/Widget.Capstone.CardView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/cardAttendance"
-                        app:layout_constraintTop_toBottomOf="@id/cardMentors">
-
+                        app:layout_constraintTop_toBottomOf="@id/cardMentors"
+                        style="@style/Widget.Capstone.CardView">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:orientation="vertical"
                             android:padding="16dp">
-
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="48dp"
                                 android:layout_height="48dp"
                                 app:cardBackgroundColor="@color/colorAccentRed"
                                 app:cardCornerRadius="24dp"
                                 app:cardElevation="0dp">
-
                                 <ImageView
                                     android:layout_width="24dp"
                                     android:layout_height="24dp"
@@ -237,118 +223,18 @@
                                     android:src="@drawable/ic_bell"
                                     app:tint="#FFFFFF" />
                             </com.google.android.material.card.MaterialCardView>
-
                             <TextView
-                                style="@style/Capstone.Text.Body"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="Critical" />
+                                android:text="Critical"
+                                style="@style/Capstone.Text.Body" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <!-- ── User Management Section (NEW) ─────────────────── -->
-                <TextView
-                    style="@style/Capstone.Text.SectionHeader"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="12dp"
-                    android:text="USER MANAGEMENT" />
-
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.Capstone.CardView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_card_with_border"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <!-- Info label -->
-                        <TextView
-                            style="@style/Capstone.Text.Muted"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="16dp"
-                            android:text="Upload a CSV/Excel file with columns:\nemail, password, photoUrl"
-                            android:textSize="12sp" />
-
-                        <!-- Add Students Button -->
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnAddStudents"
-                            style="@style/Widget.Capstone.Button"
-                            android:layout_width="match_parent"
-                            android:layout_height="52dp"
-                            android:drawableStart="@drawable/ic_person"
-                            android:drawablePadding="8dp"
-                            android:text="ADD STUDENTS  (Upload CSV/Excel)" />
-
-                        <!-- Progress bar for student import -->
-                        <ProgressBar
-                            android:id="@+id/progressStudents"
-                            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:indeterminate="true"
-                            android:visibility="gone" />
-
-                        <TextView
-                            android:id="@+id/tvStudentImportStatus"
-                            style="@style/Capstone.Text.Muted"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:textSize="12sp"
-                            android:visibility="gone" />
-
-                        <!-- Divider -->
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginVertical="16dp"
-                            android:background="@color/colorOuterBg" />
-
-                        <!-- Add Mentors Button -->
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnAddMentors"
-                            style="@style/Widget.Capstone.Button"
-                            android:layout_width="match_parent"
-                            android:layout_height="52dp"
-                            android:backgroundTint="@color/colorAccentTeal"
-                            android:drawableStart="@drawable/ic_person"
-                            android:drawablePadding="8dp"
-                            android:text="ADD MENTORS  (Upload CSV/Excel)" />
-
-                        <!-- Progress bar for mentor import -->
-                        <ProgressBar
-                            android:id="@+id/progressMentors"
-                            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:indeterminate="true"
-                            android:visibility="gone" />
-
-                        <TextView
-                            android:id="@+id/tvMentorImportStatus"
-                            style="@style/Capstone.Text.Muted"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:textSize="12sp"
-                            android:visibility="gone" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- ── Search Bar ─────────────────────────────────────── -->
+                <!-- Search Bar Redesigned -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -358,20 +244,17 @@
                     app:cardElevation="2dp"
                     app:strokeColor="@color/colorOuterBg"
                     app:strokeWidth="1dp">
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingHorizontal="16dp">
-
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:src="@drawable/ic_search"
                             app:tint="@color/colorMutedText" />
-
                         <EditText
                             android:id="@+id/etSearch"
                             android:layout_width="0dp"
@@ -418,7 +301,6 @@
             app:backgroundTint="@color/colorAccentYellow"
             app:elevation="6dp"
             app:tint="@color/colorTopBar" />
-
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.navigation.NavigationView
