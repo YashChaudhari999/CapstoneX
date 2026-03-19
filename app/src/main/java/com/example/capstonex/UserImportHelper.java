@@ -28,28 +28,47 @@ import java.util.concurrent.TimeUnit;
  * UserImportHelper — CapstonX
  * Firebase Auth + Realtime Database
  * <p>
- * FIX: Explicitly pass the Realtime DB URL so Firebase connects correctly.
- * Without this, FirebaseDatabase.getInstance() may silently fail to
- * resolve the database and writes never reach the server.
+ * ── STUDENT CSV Format (6 columns, header row optional) ──────────────────
  * <p>
- * DB URL: https://capstonex-8b885-default-rtdb.firebaseio.com
+ * sapId, rollNo, name, email, password, branch
+ * <p>
+ * 70012400171, A265, Yash Chaudhari, Yash.Chaudhari171@nmims.in, Pass@123, IT
+ * 70012400172, A266, Priya Sharma,   Priya.Sharma172@nmims.in,   Pass@456, CS
+ * <p>
+ * ── MENTOR CSV Format (4 columns, header row optional) ───────────────────
+ * <p>
+ * id, name, email, password
+ * <p>
+ * M001, Prof. Rajesh Mehta, rajesh.mehta@nmims.in, Prof@123
+ * M002, Prof. Sunita Joshi, sunita.joshi@nmims.in, Prof@456
  * <p>
  * ── Realtime DB structure ─────────────────────────────────────────────────
+ * <p>
  * Users/{uid}/
- * uid, email, role, name, sapId,
- * profileImageUrl, status, fcmToken, createdAt, createdBy
+ * uid             : Firebase Auth UID
+ * email           : from CSV
+ * role            : "student" | "mentor"
+ * name            : from CSV
+ * profileImageUrl : auto-generated from name → ui-avatars.com
+ * status          : "active"
+ * fcmToken        : "" (filled on first login)
+ * createdAt       : timestamp (ms)
+ * createdBy       : "admin_import"
+ * <p>
+ * — Student-only fields —
+ * sapId           : e.g. "70012400171"
+ * rollNo          : e.g. "A265"
+ * branch          : e.g. "IT" | "CS" | "CE" | "AIML"
+ * <p>
+ * — Mentor-only fields —
+ * mentorId        : e.g. "M001"
  */
 public class UserImportHelper {
 
     private static final String TAG = "UserImportHelper";
     private static final String SECONDARY_APP = "capstonex_importer";
-
-    // ── YOUR Realtime DB URL — explicit so Firebase always connects ────────
     private static final String DB_URL =
             "https://capstonex-8b885-default-rtdb.firebaseio.com";
-
-    private static final String DEFAULT_AVATAR =
-            "https://ui-avatars.com/api/?background=7B1C2E&color=fff&size=128&name=User";
     private static final String EMAIL_PATTERN =
             "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
     private final Context context;
@@ -57,36 +76,21 @@ public class UserImportHelper {
 
     public UserImportHelper(Context context) {
         this.context = context.getApplicationContext();
-
-        // ── FIX: Pass DB URL explicitly ────────────────────────────────────
-        // FirebaseDatabase.getInstance() alone doesn't always resolve the URL.
-        // Using getInstance(url) guarantees the correct database is targeted.
         this.usersRef = FirebaseDatabase
                 .getInstance(DB_URL)
                 .getReference()
                 .child("Users");
-
-        Log.d(TAG, "Realtime DB ref initialised → " + DB_URL + "/Users");
+        Log.d(TAG, "Realtime DB ref → " + DB_URL + "/Users");
     }
 
     // ─────────────────────────────────────────────────────────────────────
-    // Public entry point
+    // Public entry point — role decides which parser to use
     // ─────────────────────────────────────────────────────────────────────
     public void importFromFile(Uri fileUri, String role, ImportCallback callback) {
         new Thread(() -> {
             android.os.Handler main =
                     new android.os.Handler(android.os.Looper.getMainLooper());
             try {
-                List<UserRow> rows = parseCsv(fileUri);
-                Log.d(TAG, "Parsed " + rows.size() + " rows from CSV");
-
-                if (rows.isEmpty()) {
-                    main.post(() -> callback.onError(
-                            "No valid rows found.\n" +
-                                    "Expected: email,password,name,sapId,photoUrl"));
-                    return;
-                }
-
                 FirebaseAuth secondaryAuth;
                 try {
                     secondaryAuth = getSecondaryAuth();
@@ -96,7 +100,28 @@ public class UserImportHelper {
                     return;
                 }
 
-                processRows(rows, role, secondaryAuth, callback);
+                if ("student".equals(role)) {
+                    List<StudentRow> rows = parseStudentCsv(fileUri);
+                    Log.d(TAG, "Parsed " + rows.size() + " student rows");
+                    if (rows.isEmpty()) {
+                        main.post(() -> callback.onError(
+                                "No valid rows found.\n" +
+                                        "Expected: sapId,rollNo,name,email,password,branch"));
+                        return;
+                    }
+                    processStudentRows(rows, secondaryAuth, callback);
+
+                } else {
+                    List<MentorRow> rows = parseMentorCsv(fileUri);
+                    Log.d(TAG, "Parsed " + rows.size() + " mentor rows");
+                    if (rows.isEmpty()) {
+                        main.post(() -> callback.onError(
+                                "No valid rows found.\n" +
+                                        "Expected: id,name,email,password"));
+                        return;
+                    }
+                    processMentorRows(rows, secondaryAuth, callback);
+                }
 
             } catch (Exception e) {
                 Log.e(TAG, "Import error: " + e.getMessage(), e);
@@ -107,143 +132,153 @@ public class UserImportHelper {
     }
 
     // ─────────────────────────────────────────────────────────────────────
-    // Parse CSV
+    // Parse student CSV
+    // Columns: sapId, rollNo, name, email, password, branch
     // ─────────────────────────────────────────────────────────────────────
-    private List<UserRow> parseCsv(Uri fileUri) throws Exception {
-        List<UserRow> rows = new ArrayList<>();
-
-        InputStream is = context.getContentResolver().openInputStream(fileUri);
-        if (is == null) throw new Exception("Cannot open file — check permissions");
-
-        BufferedReader reader =
-                new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-
+    private List<StudentRow> parseStudentCsv(Uri fileUri) throws Exception {
+        List<StudentRow> rows = new ArrayList<>();
+        BufferedReader reader = openReader(fileUri);
         String line;
         boolean firstLine = true;
         int lineNum = 0;
 
         while ((line = reader.readLine()) != null) {
             lineNum++;
-            if (firstLine) line = line.replace("\uFEFF", ""); // strip Excel BOM
+            if (firstLine) line = line.replace("\uFEFF", "");
             line = line.trim();
             if (line.isEmpty()) continue;
 
-            // Auto-detect & skip header row
-            if (firstLine && line.toLowerCase().startsWith("email")) {
-                Log.d(TAG, "Skipping header row: " + line);
+            // Skip header row (starts with "sap" or "SAP")
+            if (firstLine && line.toLowerCase().startsWith("sap")) {
+                Log.d(TAG, "Skipping header: " + line);
                 firstLine = false;
                 continue;
             }
             firstLine = false;
 
-            String[] cols = line.split(",", -1);
-            if (cols.length < 4) {
-                Log.w(TAG, "Row " + lineNum + " skipped — only "
-                        + cols.length + " col(s): " + line);
+            String[] c = line.split(",", -1);
+            if (c.length < 5) {
+                Log.w(TAG, "Row " + lineNum + " skipped — only " + c.length + " col(s)");
                 continue;
             }
 
-            String email = cols[0].trim();
-            String password = cols[1].trim();
-            String name = cols[2].trim();
-            String sapId = cols[3].trim();
-            String photoUrl = cols.length >= 5 ? cols[4].trim() : "";
+            String sapId = c[0].trim();
+            String rollNo = c[1].trim();
+            String name = c[2].trim();
+            String email = c[3].trim();
+            String password = c[4].trim();
+            String branch = c.length >= 6 ? c[5].trim() : "";
 
-            rows.add(new UserRow(email, password, name, sapId, photoUrl));
-            Log.d(TAG, "Row " + lineNum + " parsed → " + email);
+            rows.add(new StudentRow(sapId, rollNo, name, email, password, branch));
+            Log.d(TAG, "Student row " + lineNum + " → " + email);
         }
-
         reader.close();
         return rows;
     }
 
     // ─────────────────────────────────────────────────────────────────────
-    // Process all rows sequentially
+    // Parse mentor CSV
+    // Columns: id, name, email, password
     // ─────────────────────────────────────────────────────────────────────
-    private void processRows(List<UserRow> rows, String role,
-                             FirebaseAuth secondaryAuth,
-                             ImportCallback callback) {
+    private List<MentorRow> parseMentorCsv(Uri fileUri) throws Exception {
+        List<MentorRow> rows = new ArrayList<>();
+        BufferedReader reader = openReader(fileUri);
+        String line;
+        boolean firstLine = true;
+        int lineNum = 0;
 
-        android.os.Handler main =
-                new android.os.Handler(android.os.Looper.getMainLooper());
+        while ((line = reader.readLine()) != null) {
+            lineNum++;
+            if (firstLine) line = line.replace("\uFEFF", "");
+            line = line.trim();
+            if (line.isEmpty()) continue;
 
-        int total = rows.size(), succeeded = 0, failed = 0;
+            // Skip header row (starts with "id" or "ID")
+            if (firstLine && line.toLowerCase().startsWith("id")) {
+                Log.d(TAG, "Skipping header: " + line);
+                firstLine = false;
+                continue;
+            }
+            firstLine = false;
 
-        for (int i = 0; i < rows.size(); i++) {
-            UserRow row = rows.get(i);
-            final int pos = i + 1;
-
-            Log.d(TAG, "Processing " + pos + "/" + total + " → " + row.email);
-
-            // ── Step 1: Validate ──────────────────────────────────────────
-            String validationError = validate(row);
-            if (validationError != null) {
-                failed++;
-                final String err = validationError;
-                Log.w(TAG, "Validation failed: " + err);
-                main.post(() -> callback.onRowProcessed(
-                        pos, total, row.email, false, err));
+            String[] c = line.split(",", -1);
+            if (c.length < 4) {
+                Log.w(TAG, "Row " + lineNum + " skipped — only " + c.length + " col(s)");
                 continue;
             }
 
-            // ── Step 2: Firebase Auth (secondary app) ─────────────────────
-            final boolean[] rowSuccess = {false};
-            final String[] rowError = {null};
+            String mentorId = c[0].trim();
+            String name = c[1].trim();
+            String email = c[2].trim();
+            String password = c[3].trim();
+
+            rows.add(new MentorRow(mentorId, name, email, password));
+            Log.d(TAG, "Mentor row " + lineNum + " → " + email);
+        }
+        reader.close();
+        return rows;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Process student rows
+    // ─────────────────────────────────────────────────────────────────────
+    private void processStudentRows(List<StudentRow> rows,
+                                    FirebaseAuth secondaryAuth,
+                                    ImportCallback callback) {
+        android.os.Handler main =
+                new android.os.Handler(android.os.Looper.getMainLooper());
+        int total = rows.size(), succeeded = 0, failed = 0;
+
+        for (int i = 0; i < rows.size(); i++) {
+            StudentRow row = rows.get(i);
+            final int pos = i + 1;
+
+            Log.d(TAG, "Processing student " + pos + "/" + total + " → " + row.email);
+
+            // Validate
+            String err = validateStudent(row);
+            if (err != null) {
+                failed++;
+                final String e = err;
+                main.post(() -> callback.onRowProcessed(pos, total, row.email, false, e));
+                continue;
+            }
+
+            // Auth + DB
+            final boolean[] ok = {false};
+            final String[] error = {null};
             CountDownLatch latch = new CountDownLatch(1);
 
-            secondaryAuth
-                    .createUserWithEmailAndPassword(row.email, row.password)
+            secondaryAuth.createUserWithEmailAndPassword(row.email, row.password)
                     .addOnSuccessListener(authResult -> {
                         String uid = authResult.getUser().getUid();
-                        Log.d(TAG, "✓ Auth created: " + row.email + " uid=" + uid);
+                        Log.d(TAG, "✓ Auth: " + row.email + " uid=" + uid);
                         secondaryAuth.signOut();
-
-                        // ── Step 3: Save to Realtime DB ───────────────────────
-                        saveToRealtimeDB(uid, row, role,
+                        saveStudentToDb(uid, row,
                                 () -> {
-                                    rowSuccess[0] = true;
+                                    ok[0] = true;
                                     latch.countDown();
                                 },
-                                err -> {
-                                    rowError[0] = err;
+                                e -> {
+                                    error[0] = e;
                                     latch.countDown();
                                 }
                         );
                     })
                     .addOnFailureListener(e -> {
-                        if (e instanceof FirebaseAuthUserCollisionException) {
-                            rowError[0] = "Email already registered";
-                        } else if (e instanceof FirebaseAuthWeakPasswordException) {
-                            rowError[0] = "Weak password: " + e.getMessage();
-                        } else if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                            rowError[0] = "Invalid email format";
-                        } else {
-                            rowError[0] = e.getMessage();
-                            Log.e(TAG, "✗ Auth FAILED: " + row.email
-                                    + " | " + e.getClass().getSimpleName()
-                                    + " | " + e.getMessage());
-                        }
+                        error[0] = authError(e);
                         latch.countDown();
                     });
 
-            try {
-                if (!latch.await(30, TimeUnit.SECONDS)) {
-                    rowError[0] = "Timeout — check internet connection";
-                    Log.e(TAG, "Timeout for " + row.email);
-                }
-            } catch (InterruptedException ignored) {
-            }
+            await(latch, row.email);
 
-            if (rowSuccess[0]) {
+            if (ok[0]) {
                 succeeded++;
-                main.post(() -> callback.onRowProcessed(
-                        pos, total, row.email, true, null));
+                main.post(() -> callback.onRowProcessed(pos, total, row.email, true, null));
             } else {
                 failed++;
-                final String err = rowError[0] != null
-                        ? rowError[0] : "Unknown error";
-                main.post(() -> callback.onRowProcessed(
-                        pos, total, row.email, false, err));
+                final String e = error[0] != null ? error[0] : "Unknown error";
+                main.post(() -> callback.onRowProcessed(pos, total, row.email, false, e));
             }
         }
 
@@ -252,54 +287,204 @@ public class UserImportHelper {
     }
 
     // ─────────────────────────────────────────────────────────────────────
-    // Validation
+    // Process mentor rows
     // ─────────────────────────────────────────────────────────────────────
-    private String validate(UserRow row) {
-        if (row.email.isEmpty()) return "Email is empty";
-        if (row.password.isEmpty()) return "Password is empty";
-        if (row.name.isEmpty()) return "Name is empty";
-        if (row.sapId.isEmpty()) return "SAP ID is empty";
-        if (!row.email.matches(EMAIL_PATTERN))
-            return "Invalid email: " + row.email;
-        if (row.password.length() < 6)
-            return "Password too short (min 6 chars)";
-        return null;
+    private void processMentorRows(List<MentorRow> rows,
+                                   FirebaseAuth secondaryAuth,
+                                   ImportCallback callback) {
+        android.os.Handler main =
+                new android.os.Handler(android.os.Looper.getMainLooper());
+        int total = rows.size(), succeeded = 0, failed = 0;
+
+        for (int i = 0; i < rows.size(); i++) {
+            MentorRow row = rows.get(i);
+            final int pos = i + 1;
+
+            Log.d(TAG, "Processing mentor " + pos + "/" + total + " → " + row.email);
+
+            // Validate
+            String err = validateMentor(row);
+            if (err != null) {
+                failed++;
+                final String e = err;
+                main.post(() -> callback.onRowProcessed(pos, total, row.email, false, e));
+                continue;
+            }
+
+            // Auth + DB
+            final boolean[] ok = {false};
+            final String[] error = {null};
+            CountDownLatch latch = new CountDownLatch(1);
+
+            secondaryAuth.createUserWithEmailAndPassword(row.email, row.password)
+                    .addOnSuccessListener(authResult -> {
+                        String uid = authResult.getUser().getUid();
+                        Log.d(TAG, "✓ Auth: " + row.email + " uid=" + uid);
+                        secondaryAuth.signOut();
+                        saveMentorToDb(uid, row,
+                                () -> {
+                                    ok[0] = true;
+                                    latch.countDown();
+                                },
+                                e -> {
+                                    error[0] = e;
+                                    latch.countDown();
+                                }
+                        );
+                    })
+                    .addOnFailureListener(e -> {
+                        error[0] = authError(e);
+                        latch.countDown();
+                    });
+
+            await(latch, row.email);
+
+            if (ok[0]) {
+                succeeded++;
+                main.post(() -> callback.onRowProcessed(pos, total, row.email, true, null));
+            } else {
+                failed++;
+                final String e = error[0] != null ? error[0] : "Unknown error";
+                main.post(() -> callback.onRowProcessed(pos, total, row.email, false, e));
+            }
+        }
+
+        final int s = succeeded, f = failed;
+        main.post(() -> callback.onComplete(s, f, total));
     }
 
     // ─────────────────────────────────────────────────────────────────────
-    // Save to Realtime DB → Users/{uid}
+    // Save student to Realtime DB
     // ─────────────────────────────────────────────────────────────────────
-    private void saveToRealtimeDB(String uid, UserRow row, String role,
-                                  Runnable onSuccess, StringConsumer onFailure) {
+    private void saveStudentToDb(String uid, StudentRow row,
+                                 Runnable onSuccess, StringConsumer onFailure) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("uid", uid);
+        map.put("email", row.email);
+        map.put("role", "student");
+        map.put("name", row.name);
+        map.put("sapId", row.sapId);
+        map.put("rollNo", row.rollNo);
+        map.put("branch", row.branch);
+        map.put("profileImageUrl", avatarUrl(row.name));
+        map.put("status", "active");
+        map.put("fcmToken", "");
+        map.put("createdAt", System.currentTimeMillis());
+        map.put("createdBy", "admin_import");
 
-        String finalPhoto = (row.photoUrl == null || row.photoUrl.isEmpty())
-                ? DEFAULT_AVATAR : row.photoUrl;
-
-        Map<String, Object> userMap = new HashMap<>();
-        userMap.put("uid", uid);
-        userMap.put("email", row.email);
-        userMap.put("role", role);            // "student" | "mentor"
-        userMap.put("name", row.name);
-        userMap.put("sapId", row.sapId);
-        userMap.put("profileImageUrl", finalPhoto);
-        userMap.put("status", "active");
-        userMap.put("fcmToken", "");
-        userMap.put("createdAt", System.currentTimeMillis());
-        userMap.put("createdBy", "admin_import");
-
-        Log.d(TAG, "Saving to Realtime DB: Users/" + uid);
-
-        usersRef.child(uid).setValue(userMap)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "✓ Realtime DB saved: Users/" + uid);
+        Log.d(TAG, "Saving student to DB: Users/" + uid);
+        usersRef.child(uid).setValue(map)
+                .addOnSuccessListener(v -> {
+                    Log.d(TAG, "✓ DB saved: " + uid);
                     onSuccess.run();
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "✗ Realtime DB FAILED: Users/" + uid
-                            + " | " + e.getMessage());
+                    Log.e(TAG, "✗ DB FAILED: " + uid + " | " + e.getMessage());
                     onFailure.accept("Auth OK but DB save failed: " + e.getMessage());
                 });
     }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Save mentor to Realtime DB
+    // ─────────────────────────────────────────────────────────────────────
+    private void saveMentorToDb(String uid, MentorRow row,
+                                Runnable onSuccess, StringConsumer onFailure) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("uid", uid);
+        map.put("email", row.email);
+        map.put("role", "mentor");
+        map.put("name", row.name);
+        map.put("mentorId", row.mentorId);
+        map.put("profileImageUrl", avatarUrl(row.name));
+        map.put("status", "active");
+        map.put("fcmToken", "");
+        map.put("createdAt", System.currentTimeMillis());
+        map.put("createdBy", "admin_import");
+
+        Log.d(TAG, "Saving mentor to DB: Users/" + uid);
+        usersRef.child(uid).setValue(map)
+                .addOnSuccessListener(v -> {
+                    Log.d(TAG, "✓ DB saved: " + uid);
+                    onSuccess.run();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "✗ DB FAILED: " + uid + " | " + e.getMessage());
+                    onFailure.accept("Auth OK but DB save failed: " + e.getMessage());
+                });
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Validation
+    // ─────────────────────────────────────────────────────────────────────
+    private String validateStudent(StudentRow r) {
+        if (r.sapId.isEmpty()) return "SAP ID is empty";
+        if (r.rollNo.isEmpty()) return "Roll No is empty";
+        if (r.name.isEmpty()) return "Name is empty";
+        if (r.email.isEmpty()) return "Email is empty";
+        if (r.password.isEmpty()) return "Password is empty";
+        if (!r.email.matches(EMAIL_PATTERN)) return "Invalid email: " + r.email;
+        if (r.password.length() < 6) return "Password too short (min 6 chars)";
+        return null;
+    }
+
+    private String validateMentor(MentorRow r) {
+        if (r.mentorId.isEmpty()) return "Mentor ID is empty";
+        if (r.name.isEmpty()) return "Name is empty";
+        if (r.email.isEmpty()) return "Email is empty";
+        if (r.password.isEmpty()) return "Password is empty";
+        if (!r.email.matches(EMAIL_PATTERN)) return "Invalid email: " + r.email;
+        if (r.password.length() < 6) return "Password too short (min 6 chars)";
+        return null;
+    }
+
+    /**
+     * Generate avatar URL from the person's name
+     */
+    private String avatarUrl(String name) {
+        return "https://ui-avatars.com/api/?name="
+                + name.replace(" ", "+")
+                + "&background=7B1C2E&color=fff&size=128";
+    }
+
+    /**
+     * Friendly auth error messages
+     */
+    private String authError(Exception e) {
+        if (e instanceof FirebaseAuthUserCollisionException)
+            return "Email already registered";
+        if (e instanceof FirebaseAuthWeakPasswordException)
+            return "Weak password: " + e.getMessage();
+        if (e instanceof FirebaseAuthInvalidCredentialsException)
+            return "Invalid email format";
+        Log.e(TAG, "Auth FAILED: " + e.getClass().getSimpleName()
+                + " | " + e.getMessage());
+        return e.getMessage();
+    }
+
+    /**
+     * Open a BufferedReader from a file URI
+     */
+    private BufferedReader openReader(Uri fileUri) throws Exception {
+        InputStream is = context.getContentResolver().openInputStream(fileUri);
+        if (is == null) throw new Exception("Cannot open file — check permissions");
+        return new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Await latch with 30s timeout
+     */
+    private void await(CountDownLatch latch, String email) {
+        try {
+            if (!latch.await(30, TimeUnit.SECONDS)) {
+                Log.e(TAG, "Timeout for " + email);
+            }
+        } catch (InterruptedException ignored) {
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Helpers
+    // ─────────────────────────────────────────────────────────────────────
 
     // ─────────────────────────────────────────────────────────────────────
     // Secondary FirebaseApp — admin session stays untouched
@@ -330,17 +515,30 @@ public class UserImportHelper {
         void accept(String value);
     }
 
-    // ── One parsed CSV row ────────────────────────────────────────────────
-    private static class UserRow {
-        final String email, password, name, sapId, photoUrl;
+    // ── Student row ───────────────────────────────────────────────────────
+    private static class StudentRow {
+        final String sapId, rollNo, name, email, password, branch;
 
-        UserRow(String email, String password,
-                String name, String sapId, String photoUrl) {
+        StudentRow(String sapId, String rollNo, String name,
+                   String email, String password, String branch) {
+            this.sapId = sapId.trim();
+            this.rollNo = rollNo.trim();
+            this.name = name.trim();
             this.email = email.trim();
             this.password = password.trim();
+            this.branch = branch.trim();
+        }
+    }
+
+    // ── Mentor row ────────────────────────────────────────────────────────
+    private static class MentorRow {
+        final String mentorId, name, email, password;
+
+        MentorRow(String mentorId, String name, String email, String password) {
+            this.mentorId = mentorId.trim();
             this.name = name.trim();
-            this.sapId = sapId.trim();
-            this.photoUrl = photoUrl.trim();
+            this.email = email.trim();
+            this.password = password.trim();
         }
     }
 }
