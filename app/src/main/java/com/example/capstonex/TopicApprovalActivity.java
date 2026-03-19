@@ -8,5 +8,7 @@ public class TopicApprovalActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_topic_approval);
         setupEdgeToEdge(findViewById(android.R.id.content));
+        
+        findViewById(R.id.toolbar).setOnClickListener(v -> finish());
     }
 }
