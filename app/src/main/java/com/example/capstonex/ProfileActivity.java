@@ -62,7 +62,13 @@ public class ProfileActivity extends BaseActivity {
         findViewById(R.id.fabEditImage).setOnClickListener(v -> openImagePicker());
         btnSave.setOnClickListener(v -> saveProfileChanges());
         btnLogout.setOnClickListener(v -> logout());
-        btnChangePassword.setOnClickListener(v -> changePassword());
+        
+        // Updated to redirect to ChangePasswordActivity
+        btnChangePassword.setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileActivity.this, ChangePasswordActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        });
         
         findViewById(R.id.toolbar).setOnClickListener(v -> finish());
     }
@@ -141,14 +147,5 @@ public class ProfileActivity extends BaseActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
-    }
-
-    private void changePassword() {
-        String email = mAuth.getCurrentUser().getEmail();
-        mAuth.sendPasswordResetEmail(email).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(ProfileActivity.this, "Reset email sent to " + email, Toast.LENGTH_LONG).show();
-            }
-        });
     }
 }

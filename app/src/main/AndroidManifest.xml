@@ -32,6 +32,19 @@
         <activity android:name=".ReviewEvaluationActivity" />
         <activity android:name=".MyMarksActivity" />
         <activity android:name=".AddLogActivity" />
+        <activity android:name=".ProfileActivity" />
+        <activity android:name=".ProjectTimelineActivity" />
+        <activity android:name=".DocumentsActivity" />
+        <activity android:name=".NotificationsActivity" />
+        <activity android:name=".PlagiarismActivity" />
+        <activity android:name=".MeetingsActivity" />
+        <activity android:name=".RubricManagementActivity" />
+        <activity android:name=".AnalyticsActivity" />
+        <activity android:name=".GroupCreationActivity" />
+        <activity android:name=".CalendarActivity" />
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".SupportActivity" />
+        <activity android:name=".ChangePasswordActivity" />
 
     </application>
 
