@@ -192,11 +192,7 @@ public class AdminDashboardActivity extends BaseActivity {
                     showInfoDialog("Some rows failed",
                             failed + " row(s) could not be imported.\n\n" +
                                     "Common reasons:\n" +
-                                    "• Email already registered in Firebase Auth\n" +
-                                    "  → Delete from Firebase Console → Authentication\n\n" +
-                                    "• Password shorter than 6 characters\n" +
-                                    "• Invalid email format\n\n" +
-                                    "Check Logcat (tag: UserImportHelper) for details.");
+                                    "• Email already registered in Firebase Auth\n");
                 }
 
                 // Refresh overview cards from Realtime DB

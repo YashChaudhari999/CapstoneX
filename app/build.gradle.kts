@@ -43,7 +43,7 @@ configurations.all {
     exclude(group = "com.android.support", module = "support-core-utils")
     exclude(group = "com.android.support", module = "support-fragment")
     exclude(group = "com.android.support", module = "support-media-compat")
-    
+
     resolutionStrategy {
         force("androidx.core:core:1.16.0")
         force("androidx.core:core-ktx:1.16.0")
@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.firebase.database)
+    implementation(libs.firebase.messaging)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -70,7 +71,7 @@ dependencies {
     // UI & Utilities
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("com.github.prolificinteractive:material-calendarview:2.0.1")
-    
+
     implementation("com.itextpdf:itextg:5.5.10") {
         exclude(group = "com.android.support")
     }
@@ -79,4 +80,7 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     implementation("com.intuit.sdp:sdp-android:1.1.1")
+
+    implementation("com.cloudinary:cloudinary-android:3.0.2")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 }
