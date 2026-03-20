@@ -48,6 +48,9 @@ import com.google.firebase.database.ValueEventListener;
  * Users/{uid}/name, email, profileImageUrl, mentorId
  * Groups/ (filtered by mentorUid == uid)
  */
+import com.google.android.material.navigation.NavigationView;
+import android.view.MenuItem;
+
 public class MentorDashboardActivity extends BaseActivity {
 
     private static final String DB_URL =
@@ -93,6 +96,31 @@ public class MentorDashboardActivity extends BaseActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         toolbar.setNavigationOnClickListener(v ->
                 drawerLayout.openDrawer(GravityCompat.START));
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.nav_profile) {
+                    Intent intent = new Intent(MentorDashboardActivity.this, ProfileActivity.class);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                } else if (id == R.id.nav_settings) {
+                    Intent intent = new Intent(MentorDashboardActivity.this, SettingsActivity.class);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                } else if (id == R.id.nav_approvals) {
+                    Intent intent = new Intent(MentorDashboardActivity.this, TopicApprovalActivity.class);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                }
+                // Add other menu item handlers here
+                
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
