@@ -63,18 +63,6 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
                 </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/ivNotifications"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="@drawable/ic_launcher_background"
-                    android:padding="6dp"
-                    android:src="@drawable/ic_bell"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:tint="@color/colorAccentYellow" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
