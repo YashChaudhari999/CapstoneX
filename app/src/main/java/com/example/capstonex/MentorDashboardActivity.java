@@ -23,32 +23,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-/**
- * MentorDashboardActivity — CapstonX
- * <p>
- * Loads the logged-in mentor's data from Realtime DB → Users/{uid}
- * and populates:
- * <p>
- * tvMentorName      → mentor's full name in the profile card
- * Profile ImageView → mentor's photo via Glide
- * Nav drawer header → tvMentorHeaderName, tvMentorHeaderEmail, avatar
- * ivNotifications   → opens NotificationsActivity
- * rvGroups          → groups assigned to this mentor (from Groups node)
- * btnSummary        → opens AnalyticsActivity
- * <p>
- * XML IDs (activity_mentor_dashboard.xml):
- * drawer_layout, toolbar, nav_view (NavigationView),
- * tvMentorName, ivNotifications, rvGroups, btnSummary
- * <p>
- * Nav header IDs (nav_header_mentor.xml):
- * tvMentorHeaderName, tvMentorHeaderEmail, cvMentorHeaderAvatar
- * <p>
- * Realtime DB fields read:
- * Users/{uid}/name, email, profileImageUrl, mentorId
- * Groups/ (filtered by mentorUid == uid)
- */
-import com.google.android.material.navigation.NavigationView;
 import android.view.MenuItem;
 
 public class MentorDashboardActivity extends BaseActivity {
@@ -56,13 +30,11 @@ public class MentorDashboardActivity extends BaseActivity {
     private static final String DB_URL =
             "https://capstonex-8b885-default-rtdb.firebaseio.com";
 
-    // ── Views ──────────────────────────────────────────────────────────────
     private DrawerLayout drawerLayout;
     private TextView tvMentorName;
-    private ImageView ivProfileCard; // inside profile card in main content
+    private ImageView ivProfileCard;
     private RecyclerView rvGroups;
 
-    // ── Firebase ───────────────────────────────────────────────────────────
     private FirebaseAuth mAuth;
     private DatabaseReference userRef;
     private DatabaseReference groupsRef;
@@ -75,7 +47,6 @@ public class MentorDashboardActivity extends BaseActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        // Safety check
         if (mAuth.getCurrentUser() == null) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
@@ -88,7 +59,6 @@ public class MentorDashboardActivity extends BaseActivity {
         groupsRef = FirebaseDatabase.getInstance(DB_URL)
                 .getReference().child("Groups");
 
-        // ── Toolbar & Drawer ───────────────────────────────────────────────
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) getSupportActionBar().setTitle("");
@@ -106,16 +76,17 @@ public class MentorDashboardActivity extends BaseActivity {
                     Intent intent = new Intent(MentorDashboardActivity.this, ProfileActivity.class);
                     startActivity(intent);
                     overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                } else if (id == R.id.nav_settings) {
-                    Intent intent = new Intent(MentorDashboardActivity.this, SettingsActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 } else if (id == R.id.nav_approvals) {
                     Intent intent = new Intent(MentorDashboardActivity.this, TopicApprovalActivity.class);
                     startActivity(intent);
                     overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                } else if (id == R.id.nav_logout) {
+                    mAuth.signOut();
+                    Intent intent = new Intent(MentorDashboardActivity.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
                 }
-                // Add other menu item handlers here
                 
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
@@ -134,55 +105,27 @@ public class MentorDashboardActivity extends BaseActivity {
             }
         });
 
-        // ── Bind views ─────────────────────────────────────────────────────
         tvMentorName = findViewById(R.id.tvMentorName);
         rvGroups = findViewById(R.id.rvGroups);
         rvGroups.setLayoutManager(new LinearLayoutManager(this));
 
-        // Profile ImageView is inside the MaterialCardView in the content card
-        // It's the first ImageView in the horizontal layout inside the blue card
         ivProfileCard = findProfileImageView();
 
-        // ── Toolbar actions ────────────────────────────────────────────────
         findViewById(R.id.ivNotifications).setOnClickListener(v -> {
             Intent intent = new Intent(this, NotificationsActivity.class);
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
 
-        // ── Summary button ─────────────────────────────────────────────────
         findViewById(R.id.btnSummary).setOnClickListener(v -> {
             Intent intent = new Intent(this, AnalyticsActivity.class);
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
 
-        // ── Drawer nav item clicks ─────────────────────────────────────────
-        NavigationView navView = findViewById(R.id.nav_view);
-        navView.setNavigationItemSelectedListener(item -> {
-            drawerLayout.closeDrawer(GravityCompat.START);
-            int id = item.getItemId();
-//            if (id == R.id.nav_meetings) {
-//                startActivity(new Intent(this, MeetingsActivity.class));
-//            } else if (id == R.id.nav_rubric) {
-//                startActivity(new Intent(this, RubricManagementActivity.class));
-//            } else if (id == R.id.nav_topic_approval) {
-//                startActivity(new Intent(this, TopicApprovalActivity.class));
-//            } else if (id == R.id.nav_notifications) {
-//                startActivity(new Intent(this, NotificationsActivity.class));
-//            } else if (id == R.id.nav_settings) {
-//                startActivity(new Intent(this, SettingsActivity.class));
-//            }
-            return true;
-        });
-
-        // ── Load mentor data ───────────────────────────────────────────────
-        loadMentorData(uid, navView);
+        loadMentorData(uid, navigationView);
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // Load mentor data from Realtime DB
-    // ─────────────────────────────────────────────────────────────────────
     private void loadMentorData(String uid, NavigationView navView) {
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -196,11 +139,9 @@ public class MentorDashboardActivity extends BaseActivity {
                 if (name == null) name = "Mentor";
                 if (email == null) email = "";
 
-                // ── Populate main content profile card ────────────────────
                 tvMentorName.setText(name);
 
                 if (photoUrl != null && !photoUrl.isEmpty()) {
-                    // Load into main content card avatar
                     if (ivProfileCard != null) {
                         Glide.with(MentorDashboardActivity.this)
                                 .load(photoUrl)
@@ -211,7 +152,6 @@ public class MentorDashboardActivity extends BaseActivity {
                     }
                 }
 
-                // ── Populate Navigation Drawer header ─────────────────────
                 View headerView = navView.getHeaderView(0);
                 if (headerView != null) {
                     TextView tvHeaderName = headerView.findViewById(R.id.tvMentorHeaderName);
@@ -242,62 +182,43 @@ public class MentorDashboardActivity extends BaseActivity {
             }
         });
 
-        // ── Load assigned groups ───────────────────────────────────────────
         loadAssignedGroups(uid);
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // Load groups where mentorUid == this mentor's uid
-    // ─────────────────────────────────────────────────────────────────────
     private void loadAssignedGroups(String uid) {
         groupsRef.orderByChild("mentorUid").equalTo(uid)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        // Build a simple list of group names for now
-                        // Replace with a proper GroupAdapter when ready
                         java.util.List<String> groupNames = new java.util.ArrayList<>();
                         for (DataSnapshot group : snapshot.getChildren()) {
                             String groupName = group.child("name").getValue(String.class);
                             if (groupName != null) groupNames.add(groupName);
                         }
-
-                        // Simple text adapter to show group names until GroupAdapter is built
                         rvGroups.setAdapter(new SimpleStringAdapter(groupNames));
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        // Show empty state — no crash
                     }
                 });
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // Find the profile ImageView inside the blue profile card in main content
-    // The card contains a horizontal LinearLayout → CardView → ImageView
-    // ─────────────────────────────────────────────────────────────────────
     private ImageView findProfileImageView() {
         try {
-            // The content card's LinearLayout → first child is the avatar CardView
             android.view.ViewGroup contentCard =
                     (android.view.ViewGroup) ((android.view.ViewGroup)
                             rvGroups.getParent()).getChildAt(0);
-            // Walk into the first MaterialCardView → LinearLayout → CardView → ImageView
             android.view.ViewGroup outerLayout =
                     (android.view.ViewGroup) contentCard.getChildAt(0);
             android.view.ViewGroup avatarCard =
                     (android.view.ViewGroup) outerLayout.getChildAt(0);
             return (ImageView) avatarCard.getChildAt(0);
         } catch (Exception e) {
-            return null; // graceful fallback — photo just won't load
+            return null;
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // Minimal inline adapter for group name strings
-    // Replace this with a full GroupAdapter when building the groups feature
-    // ─────────────────────────────────────────────────────────────────────
     private static class SimpleStringAdapter
             extends RecyclerView.Adapter<SimpleStringAdapter.VH> {
 
@@ -335,43 +256,3 @@ public class MentorDashboardActivity extends BaseActivity {
         }
     }
 }
-
-
-//package com.example.capstonex;
-//
-//import android.os.Bundle;
-//
-//import androidx.activity.OnBackPressedCallback;
-//import androidx.appcompat.widget.Toolbar;
-//import androidx.core.view.GravityCompat;
-//import androidx.drawerlayout.widget.DrawerLayout;
-//
-//public class MentorDashboardActivity extends BaseActivity {
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_mentor_dashboard);
-//        setupEdgeToEdge(findViewById(android.R.id.content));
-//
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//        if (getSupportActionBar() != null) {
-//            getSupportActionBar().setTitle("");
-//        }
-//
-//        final DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
-//        toolbar.setNavigationOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
-//
-//        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-//            @Override
-//            public void handleOnBackPressed() {
-//                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-//                    drawerLayout.closeDrawer(GravityCompat.START);
-//                } else {
-//                    setEnabled(false);
-//                    getOnBackPressedDispatcher().onBackPressed();
-//                }
-//            }
-//        });
-//    }
-//}
