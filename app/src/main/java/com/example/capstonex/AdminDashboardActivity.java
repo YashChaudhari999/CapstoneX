@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -19,22 +20,14 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-/**
- * AdminDashboardActivity — CapstonX
- * <p>
- * FIX: Removed ALL Firestore references.
- * loadOverviewCounts() now reads from Realtime DB → Users node,
- * filtering by role = "mentor" for mentor count,
- * and reading Groups node for group count.
- * <p>
- * This eliminates the Firestore WriteStream NOT_FOUND errors.
- */
 public class AdminDashboardActivity extends BaseActivity {
 
     private static final String TAG = "AdminDashboard";
@@ -43,19 +36,17 @@ public class AdminDashboardActivity extends BaseActivity {
     private static final int REQ_PICK_STUDENTS = 101;
     private static final int REQ_PICK_MENTORS = 102;
 
-    // ── Views ──────────────────────────────────────────────────────────────
     private MaterialButton btnAddStudents, btnAddMentors;
     private ProgressBar progressStudents, progressMentors;
     private TextView tvStudentImportStatus, tvMentorImportStatus;
     private TextView tvGroupCount, tvMentorCount;
 
-    // ── Firebase — Realtime DB only, no Firestore ──────────────────────────
     private DatabaseReference usersRef;
     private DatabaseReference groupsRef;
     private UserImportHelper importHelper;
 
-    // ── Progress dialog ────────────────────────────────────────────────────
     private ProgressDialog progressDialog;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,18 +54,16 @@ public class AdminDashboardActivity extends BaseActivity {
         setContentView(R.layout.activity_admin_dashboard);
         setupEdgeToEdge(findViewById(R.id.admin_drawer_layout));
 
-        // ── Realtime DB refs (explicit URL — no Firestore) ─────────────────
+        mAuth = FirebaseAuth.getInstance();
         FirebaseDatabase realtimeDb = FirebaseDatabase.getInstance(DB_URL);
         usersRef = realtimeDb.getReference().child("Users");
         groupsRef = realtimeDb.getReference().child("Groups");
 
         importHelper = new UserImportHelper(this);
 
-        // ── Progress dialog ────────────────────────────────────────────────
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
 
-        // ── Toolbar & Drawer ───────────────────────────────────────────────
         Toolbar toolbar = findViewById(R.id.admin_toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) getSupportActionBar().setTitle("");
@@ -82,6 +71,24 @@ public class AdminDashboardActivity extends BaseActivity {
         final DrawerLayout drawerLayout = findViewById(R.id.admin_drawer_layout);
         toolbar.setNavigationOnClickListener(v ->
                 drawerLayout.openDrawer(GravityCompat.START));
+
+        NavigationView navigationView = findViewById(R.id.admin_nav_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.nav_logout) {
+                    mAuth.signOut();
+                    Intent intent = new Intent(AdminDashboardActivity.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                }
+                
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -95,7 +102,6 @@ public class AdminDashboardActivity extends BaseActivity {
             }
         });
 
-        // ── Bind views ─────────────────────────────────────────────────────
         btnAddStudents = findViewById(R.id.btnAddStudents);
         btnAddMentors = findViewById(R.id.btnAddMentors);
         progressStudents = findViewById(R.id.progressStudents);
@@ -111,7 +117,6 @@ public class AdminDashboardActivity extends BaseActivity {
         loadOverviewCounts();
     }
 
-    // ── File picker ───────────────────────────────────────────────────────
     private void openFilePicker(int requestCode) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");
@@ -143,7 +148,6 @@ public class AdminDashboardActivity extends BaseActivity {
         }
     }
 
-    // ── Import ────────────────────────────────────────────────────────────
     private void startImport(Uri fileUri, String role,
                              MaterialButton button,
                              ProgressBar progressBar,
@@ -195,7 +199,6 @@ public class AdminDashboardActivity extends BaseActivity {
                                     "• Email already registered in Firebase Auth\n");
                 }
 
-                // Refresh overview cards from Realtime DB
                 loadOverviewCounts();
             }
 
@@ -211,12 +214,7 @@ public class AdminDashboardActivity extends BaseActivity {
         });
     }
 
-    // ── Load overview counts from Realtime DB ─────────────────────────────
-    // FIX: Reads Users node filtered by role="mentor" for mentor count
-    //      and Groups node for group count — NO Firestore calls
     private void loadOverviewCounts() {
-
-        // ── Mentor count ───────────────────────────────────────────────────
         usersRef.orderByChild("role").equalTo("mentor")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -230,7 +228,6 @@ public class AdminDashboardActivity extends BaseActivity {
                     }
                 });
 
-        // ── Group count ────────────────────────────────────────────────────
         groupsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -245,7 +242,6 @@ public class AdminDashboardActivity extends BaseActivity {
         });
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────
     private void dismissProgress() {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
