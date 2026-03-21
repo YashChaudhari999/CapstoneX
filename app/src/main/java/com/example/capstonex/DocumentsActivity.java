@@ -23,11 +23,11 @@ public class DocumentsActivity extends BaseActivity {
 
     private static final int PICK_FILE_REQUEST = 2;
     private String currentUploadType = "";
-    
+
     private RecyclerView rvDocuments;
     private DocumentAdapter adapter;
     private List<DocumentModel> documentList;
-    
+
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private FirebaseStorage storage;

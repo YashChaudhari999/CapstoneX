@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/profile_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -18,9 +17,9 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="95dp"
+            android:layout_marginBottom="1dp"
             android:minHeight="?attr/actionBarSize"
             android:paddingTop="35dp"
-            android:layout_marginBottom="1dp"
             app:navigationIcon="@drawable/ic_back"
             app:navigationIconTint="#FFFFFF">
 
@@ -34,13 +33,13 @@
                     android:id="@+id/cvToolbarProfile"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
+                    android:clickable="false"
+                    android:focusable="false"
                     app:cardCornerRadius="20dp"
-                    app:cardElevation="2dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground">
+                    app:cardElevation="2dp">
 
                     <ImageView
+                        android:id="@+id/ivToolbarAvatar"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
@@ -63,6 +62,18 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
                 </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/ivNotifications"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/ic_launcher_background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_bell"
+                    app:tint="@color/colorAccentYellow" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
@@ -81,6 +92,7 @@
             android:orientation="vertical"
             android:padding="24dp">
 
+            <!-- Profile photo with FAB overlay -->
             <FrameLayout
                 android:layout_width="120dp"
                 android:layout_height="120dp">
@@ -101,6 +113,7 @@
                         android:src="@drawable/ic_person" />
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- FAB: ✏️ pick photo  /  ✕ undo pending photo -->
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/fabEditImage"
                     android:layout_width="wrap_content"
@@ -112,11 +125,22 @@
                     app:tint="@color/colorTopBar" />
             </FrameLayout>
 
+            <!-- Hint shown below avatar -->
+            <TextView
+                android:id="@+id/tvPhotoHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Tap ✏️ to change photo"
+                android:textColor="@color/colorMutedText"
+                android:textSize="12sp" />
+
+            <!-- Personal Information — all fields read-only -->
             <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.Capstone.CardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                style="@style/Widget.Capstone.CardView">
+                android:layout_marginTop="24dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -126,79 +150,99 @@
                     android:padding="16dp">
 
                     <TextView
+                        style="@style/Capstone.Text.CardLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="PERSONAL INFORMATION"
-                        style="@style/Capstone.Text.CardLabel"
                         android:textStyle="bold" />
 
+                    <!-- Name — read-only -->
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
+                        android:enabled="false"
                         android:hint="Full Name">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etProfileName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
                             android:inputType="textPersonName" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:hint="Phone Number">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etProfilePhone"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="phone" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:hint="Department">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etProfileDept"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="text" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
+                    <!-- Department / Branch — read-only -->
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:enabled="false"
-                        android:hint="Email (Non-editable)">
+                        android:hint="Department / Branch">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etProfileDept"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:inputType="text" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Email — read-only -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:enabled="false"
+                        android:hint="Email">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etProfileEmail"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
                             android:inputType="textEmailAddress" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- SAP ID — read-only (students only, hidden for others) -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilSapId"
+                        style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:enabled="false"
+                        android:hint="SAP ID / Roll No">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etProfileSapId"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:inputType="text" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!--
+                UPDATE PROFILE PHOTO button
+                • Disabled + greyed by default (no pending photo)
+                • Enabled + full colour when user has picked a new photo
+                • Tapping uploads to Cloudinary and saves URL to DB
+            -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveProfile"
                 style="@style/Widget.Capstone.Button"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="24dp"
-                android:text="SAVE CHANGES" />
+                android:alpha="0.5"
+                android:enabled="false"
+                android:text="UPDATE PROFILE PHOTO" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnChangePassword"
@@ -217,8 +261,8 @@
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="32dp"
                 android:text="LOGOUT"
-                app:strokeColor="@color/colorDashboardRed"
-                android:textColor="@color/colorDashboardRed" />
+                android:textColor="@color/colorDashboardRed"
+                app:strokeColor="@color/colorDashboardRed" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

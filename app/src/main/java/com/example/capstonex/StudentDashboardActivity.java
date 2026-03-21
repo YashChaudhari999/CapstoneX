@@ -45,7 +45,7 @@ public class StudentDashboardActivity extends BaseActivity {
 
     // ── Views ──────────────────────────────────────────────────────────────
     private TextView tvStudentName, tvProgressPercent;
-    private ImageView ivProfile;
+    private ImageView ivToolbarAvatar;
     private ProgressBar pbOverall;
 
     // ── Firebase ───────────────────────────────────────────────────────────
@@ -75,15 +75,7 @@ public class StudentDashboardActivity extends BaseActivity {
         tvStudentName = findViewById(R.id.tvStudentName);
         tvProgressPercent = findViewById(R.id.tvProgressPercent);
         pbOverall = findViewById(R.id.pbOverall);
-
-        // Profile image is inside the MaterialCardView cvToolbarProfile
-        ivProfile = findViewById(R.id.cvToolbarProfile)
-                .findViewById(android.R.id.content);
-        // Fallback: find the ImageView directly inside the card
-        if (ivProfile == null) {
-            ivProfile = (ImageView) ((android.view.ViewGroup)
-                    findViewById(R.id.cvToolbarProfile)).getChildAt(0);
-        }
+        ivToolbarAvatar = findViewById(R.id.ivToolbarAvatar);
 
         // ── Load user data from Realtime DB ────────────────────────────────
         loadUserData();
@@ -145,13 +137,14 @@ public class StudentDashboardActivity extends BaseActivity {
                 // ── Profile photo ─────────────────────────────────────────
                 String photoUrl = snapshot.child("profileImageUrl")
                         .getValue(String.class);
-                if (photoUrl != null && !photoUrl.isEmpty() && ivProfile != null) {
+                if (photoUrl != null && !photoUrl.isEmpty()
+                        && ivToolbarAvatar != null) {
                     Glide.with(StudentDashboardActivity.this)
                             .load(photoUrl)
                             .placeholder(R.drawable.ic_person)
                             .circleCrop()
                             .transition(DrawableTransitionOptions.withCrossFade())
-                            .into(ivProfile);
+                            .into(ivToolbarAvatar);
                 }
 
                 // ── Project progress ──────────────────────────────────────
