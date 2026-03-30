@@ -73,10 +73,18 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Group Details"
+                        style="@style/Capstone.Text.SectionHeader"
+                        android:textStyle="bold" />
+
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
                         android:hint="Group Name">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etGroupName"
@@ -97,12 +105,15 @@
                             android:inputType="number" />
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- Dynamic Members Container -->
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilMember2"
                         style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:hint="Member 2 SAP ID">
+                        android:hint="Member 2 SAP ID"
+                        android:visibility="gone">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etMember2Sap"
                             android:layout_width="match_parent"
@@ -111,11 +122,13 @@
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilMember3"
                         style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:hint="Member 3 SAP ID">
+                        android:hint="Member 3 SAP ID"
+                        android:visibility="gone">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etMember3Sap"
                             android:layout_width="match_parent"
@@ -123,12 +136,37 @@
                             android:inputType="number" />
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilMember4"
+                        style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:hint="Member 4 SAP ID"
+                        android:visibility="gone">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etMember4Sap"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAddMember"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_gravity="end"
+                        android:text="Add Member"
+                        app:icon="@drawable/ic_plus" />
+
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnCreateGroup"
                         style="@style/Widget.Capstone.Button"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginTop="16dp"
                         android:text="CREATE GROUP" />
 
                 </LinearLayout>

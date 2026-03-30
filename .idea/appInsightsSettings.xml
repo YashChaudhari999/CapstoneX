@@ -6,14 +6,6 @@
         <entry key="Firebase Crashlytics">
           <value>
             <InsightsFilterSettings>
-              <option name="connection">
-                <ConnectionSetting>
-                  <option name="appId" value="com.example.capstonex" />
-                  <option name="mobileSdkAppId" value="1:458473373970:android:41c3979789bd1d4127b3cb" />
-                  <option name="projectId" value="capstonex-8b885" />
-                  <option name="projectNumber" value="458473373970" />
-                </ConnectionSetting>
-              </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
               <option name="timeIntervalDays" value="THIRTY_DAYS" />
               <option name="visibilityType" value="ALL" />
