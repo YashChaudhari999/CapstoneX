@@ -83,6 +83,10 @@ public class AdminDashboardActivity extends BaseActivity {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
+                } else if (id == R.id.nav_manage_groups) {
+                    Intent intent = new Intent(AdminDashboardActivity.this, ManageGroupsActivity.class);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 }
                 
                 drawerLayout.closeDrawer(GravityCompat.START);
