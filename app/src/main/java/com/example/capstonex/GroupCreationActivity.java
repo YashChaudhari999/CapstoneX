@@ -16,9 +16,9 @@ import java.util.Map;
 
 public class GroupCreationActivity extends BaseActivity {
 
-    private TextInputEditText etGroupName, etLeaderSap, etMember2Sap, etMember3Sap, etMember4Sap;
+    private TextInputEditText etLeaderSap, etMember2Sap, etMember3Sap, etMember4Sap;
     private TextInputLayout tilMember2, tilMember3, tilMember4;
-    private MaterialButton btnAddMember, btnCreateGroup;
+    private MaterialButton btnAddMember, btnRemoveMember, btnCreateGroup;
     private FirebaseFirestore db;
     private int memberCount = 1; // Starting with only leader
 
@@ -31,7 +31,6 @@ public class GroupCreationActivity extends BaseActivity {
         db = FirebaseFirestore.getInstance();
 
         // Initialize views
-        etGroupName = findViewById(R.id.etGroupName);
         etLeaderSap = findViewById(R.id.etLeaderSap);
         etMember2Sap = findViewById(R.id.etMember2Sap);
         etMember3Sap = findViewById(R.id.etMember3Sap);
@@ -42,9 +41,11 @@ public class GroupCreationActivity extends BaseActivity {
         tilMember4 = findViewById(R.id.tilMember4);
 
         btnAddMember = findViewById(R.id.btnAddMember);
+        btnRemoveMember = findViewById(R.id.btnRemoveMember);
         btnCreateGroup = findViewById(R.id.btnCreateGroup);
 
         btnAddMember.setOnClickListener(v -> addMemberField());
+        btnRemoveMember.setOnClickListener(v -> removeMemberField());
         btnCreateGroup.setOnClickListener(v -> createGroup());
         findViewById(R.id.toolbar).setOnClickListener(v -> finish());
     }
@@ -52,6 +53,7 @@ public class GroupCreationActivity extends BaseActivity {
     private void addMemberField() {
         if (memberCount == 1) {
             tilMember2.setVisibility(View.VISIBLE);
+            btnRemoveMember.setVisibility(View.VISIBLE);
             memberCount++;
         } else if (memberCount == 2) {
             tilMember3.setVisibility(View.VISIBLE);
@@ -63,12 +65,29 @@ public class GroupCreationActivity extends BaseActivity {
         }
     }
 
+    private void removeMemberField() {
+        if (memberCount == 4) {
+            tilMember4.setVisibility(View.GONE);
+            etMember4Sap.setText("");
+            btnAddMember.setVisibility(View.VISIBLE);
+            memberCount--;
+        } else if (memberCount == 3) {
+            tilMember3.setVisibility(View.GONE);
+            etMember3Sap.setText("");
+            memberCount--;
+        } else if (memberCount == 2) {
+            tilMember2.setVisibility(View.GONE);
+            etMember2Sap.setText("");
+            btnRemoveMember.setVisibility(View.GONE);
+            memberCount--;
+        }
+    }
+
     private void createGroup() {
-        String name = etGroupName.getText().toString().trim();
         String leaderSap = etLeaderSap.getText().toString().trim();
 
-        if (name.isEmpty() || leaderSap.isEmpty()) {
-            Toast.makeText(this, "Please fill required fields", Toast.LENGTH_SHORT).show();
+        if (leaderSap.isEmpty()) {
+            Toast.makeText(this, "Leader SAP ID is required", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -89,10 +108,9 @@ public class GroupCreationActivity extends BaseActivity {
         }
 
         Map<String, Object> group = new HashMap<>();
-        group.put("name", name);
         group.put("members", members);
         group.put("createdAt", com.google.firebase.Timestamp.now());
-        group.put("status", "pending"); // Default status
+        group.put("status", "pending");
 
         db.collection("groups").add(group)
                 .addOnSuccessListener(ref -> {

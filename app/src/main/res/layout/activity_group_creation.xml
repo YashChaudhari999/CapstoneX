@@ -24,29 +24,14 @@
             app:navigationIcon="@drawable/ic_back"
             app:navigationIconTint="#FFFFFF">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tvGroupToolbarTitle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tvGroupToolbarTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Create Project Group"
-                        android:textColor="#FFFFFF"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </LinearLayout>
+                android:text="CapstoneX Group Creation"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -76,28 +61,17 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Group Details"
-                        style="@style/Capstone.Text.SectionHeader"
+                        android:text="MEMBER DETAILS"
+                        style="@style/Capstone.Text.CardLabel"
                         android:textStyle="bold" />
 
+                    <!-- Leader is always required -->
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:hint="Group Name">
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etGroupName"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:hint="Leader SAP ID">
+                        android:hint="Leader SAP ID (Member 1)">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etLeaderSap"
                             android:layout_width="match_parent"
@@ -105,7 +79,7 @@
                             android:inputType="number" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Dynamic Members Container -->
+                    <!-- Dynamic Members initially GONE -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilMember2"
                         style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
@@ -151,28 +125,50 @@
                             android:inputType="number" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnAddMember"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
+                    <!-- Control Buttons Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:layout_gravity="end"
-                        android:text="Add Member"
-                        app:icon="@drawable/ic_plus" />
+                        android:gravity="end"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnRemoveMember"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Remove"
+                            android:visibility="gone"
+                            android:textColor="@color/colorDashboardRed"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            app:iconTint="@color/colorDashboardRed" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnAddMember"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Add Member"
+                            android:textColor="@color/colorLearningNavy"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            app:icon="@drawable/ic_plus"
+                            app:iconTint="@color/colorLearningNavy" />
+
+                    </LinearLayout>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnCreateGroup"
                         style="@style/Widget.Capstone.Button"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="24dp"
                         android:text="CREATE GROUP" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
