@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/student_dashboard_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorOuterBg"
-    android:fitsSystemWindows="false">
+    android:background="@color/colorOuterBg">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorTopBar"
@@ -17,10 +16,11 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="95dp"
-            android:layout_marginBottom="12dp"
+            android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize"
-            android:paddingTop="35dp">
+            android:paddingTop="35dp"
+            android:layout_marginBottom="1dp"
+            app:contentInsetStart="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -32,11 +32,10 @@
                     android:id="@+id/cvToolbarProfile"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
                     app:cardCornerRadius="20dp"
-                    app:cardElevation="2dp">
+                    app:cardElevation="2dp"
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <ImageView
                         android:id="@+id/ivToolbarAvatar"
@@ -57,7 +56,7 @@
                         android:id="@+id/tvStudentName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Student Dashboard"
+                        android:text="Hi, Student!"
                         android:textColor="#FFFFFF"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -68,10 +67,11 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_marginEnd="16dp"
-                    android:clickable="true"
-                    android:focusable="true"
+                    android:background="@drawable/ic_launcher_background"
                     android:padding="6dp"
                     android:src="@drawable/ic_bell"
+                    android:clickable="true"
+                    android:focusable="true"
                     app:tint="@color/colorAccentYellow" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
@@ -91,42 +91,66 @@
             android:padding="16dp">
 
             <TextView
-                style="@style/Capstone.Text.SectionHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="DASHBOARD OVERVIEW" />
+                android:text="DASHBOARD OVERVIEW"
+                style="@style/Capstone.Text.SectionHeader" />
+
+            <!-- Project Details Card (Visible only when group created) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardGroupInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                style="@style/Widget.Capstone.CardView">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_card_with_border"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView
+                        android:id="@+id/tvDisplayGroupName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Project Title: [Loading...]"
+                        style="@style/Capstone.Text.SectionHeader" />
+                    <TextView
+                        android:id="@+id/tvDisplayMembers"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Members: [Loading...]"
+                        style="@style/Capstone.Text.Muted" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:columnCount="2">
+                android:columnCount="2"
+                android:rowCount="2">
 
                 <!-- Timeline Tile -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/tileTimeline"
-                    style="@style/Widget.Capstone.CardView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground">
-
+                    style="@style/Widget.Capstone.CardView">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
                         android:padding="16dp">
-
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="48dp"
                             android:layout_height="48dp"
                             app:cardBackgroundColor="@color/colorAccentBlue"
                             app:cardCornerRadius="24dp"
                             app:cardElevation="0dp">
-
                             <ImageView
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
@@ -134,41 +158,34 @@
                                 android:src="@drawable/ic_calendar"
                                 app:tint="#FFFFFF" />
                         </com.google.android.material.card.MaterialCardView>
-
                         <TextView
-                            style="@style/Capstone.Text.Body"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Timeline" />
+                            android:text="Timeline"
+                            style="@style/Capstone.Text.Body" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
                 <!-- Documents Tile -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/tileDocuments"
-                    style="@style/Widget.Capstone.CardView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground">
-
+                    style="@style/Widget.Capstone.CardView">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
                         android:padding="16dp">
-
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="48dp"
                             android:layout_height="48dp"
                             app:cardBackgroundColor="@color/colorAccentTeal"
                             app:cardCornerRadius="24dp"
                             app:cardElevation="0dp">
-
                             <ImageView
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
@@ -176,81 +193,103 @@
                                 android:src="@drawable/ic_book"
                                 app:tint="#FFFFFF" />
                         </com.google.android.material.card.MaterialCardView>
-
                         <TextView
-                            style="@style/Capstone.Text.Body"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Documents" />
+                            android:text="Documents"
+                            style="@style/Capstone.Text.Body" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Registration Tile (Visible only when NOT in a group) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tileCreateGroup"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    style="@style/Widget.Capstone.CardView">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            app:cardBackgroundColor="@color/colorAccentYellow"
+                            app:cardCornerRadius="24dp"
+                            app:cardElevation="0dp">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_plus"
+                                app:tint="#FFFFFF" />
+                        </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Register Group"
+                            style="@style/Capstone.Text.Body" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Title Approval Tile (Visible only when group created) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tileTitleApproval"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:visibility="gone"
+                    style="@style/Widget.Capstone.CardView">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            app:cardBackgroundColor="@color/colorDashboardRed"
+                            app:cardCornerRadius="24dp"
+                            app:cardElevation="0dp">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_checklist"
+                                app:tint="#FFFFFF" />
+                        </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Title Approval"
+                            style="@style/Capstone.Text.Body" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </GridLayout>
 
-            <!-- Create Group Section -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/tileCreateGroup"
-                style="@style/Widget.Capstone.CardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
-
+                style="@style/Widget.Capstone.CardView">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_card_with_border"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        app:cardBackgroundColor="@color/colorAccentGreen"
-                        app:cardCornerRadius="24dp"
-                        app:cardElevation="0dp">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_plus"
-                            app:tint="#FFFFFF" />
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <TextView
-                        style="@style/Capstone.Text.Body"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:text="CREATE PROJECT GROUP"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardProgress"
-                style="@style/Widget.Capstone.CardView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_card_with_border"
                     android:orientation="vertical"
+                    android:background="@drawable/bg_card_with_border"
                     android:padding="16dp">
-
                     <TextView
-                        style="@style/Capstone.Text.SectionHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="PROJECT PROGRESS" />
-
+                        android:text="PROJECT PROGRESS"
+                        style="@style/Capstone.Text.SectionHeader" />
                     <ProgressBar
                         android:id="@+id/pbOverall"
                         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
@@ -259,15 +298,14 @@
                         android:layout_marginTop="16dp"
                         android:progress="65"
                         android:progressTint="@color/colorAccentGreen" />
-
                     <TextView
                         android:id="@+id/tvProgressPercent"
-                        style="@style/Capstone.Text.CardLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
                         android:layout_marginTop="4dp"
-                        android:text="65% Completed" />
+                        android:text="65% Completed"
+                        style="@style/Capstone.Text.CardLabel" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
