@@ -85,15 +85,19 @@ public class ManageGroupsActivity extends BaseActivity {
     private void filterGroups(String query) {
         filteredList.clear();
         for (GroupModel group : groupList) {
-            if (group.getGroupName() != null && group.getGroupName().toLowerCase().contains(query.toLowerCase())) {
-                filteredList.add(group);
-            } else {
+            boolean matchesId = group.getId() != null && group.getId().toLowerCase().contains(query.toLowerCase());
+            boolean matchesSap = false;
+            if (group.getMembers() != null) {
                 for (String sap : group.getMembers()) {
                     if (sap.contains(query)) {
-                        filteredList.add(group);
+                        matchesSap = true;
                         break;
                     }
                 }
+            }
+            
+            if (matchesId || matchesSap) {
+                filteredList.add(group);
             }
         }
         adapter.notifyDataSetChanged();
@@ -113,12 +117,19 @@ public class ManageGroupsActivity extends BaseActivity {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             GroupModel group = list.get(position);
-            holder.tvName.setText(group.getGroupName() != null ? group.getGroupName() : "Group " + group.getId().substring(0, 5));
+            
+            // Set Group ID instead of Name
+            holder.tvId.setText("Group ID: #" + (group.getId() != null ? group.getId() : "N/A"));
             holder.tvStatus.setText(group.getStatus() != null ? group.getStatus().toUpperCase() : "PENDING");
             
-            StringBuilder members = new StringBuilder("Members: ");
-            for (String sap : group.getMembers()) members.append(sap).append(", ");
-            holder.tvMembers.setText(members.toString().substring(0, members.length() - 2));
+            if (group.getMembers() != null && !group.getMembers().isEmpty()) {
+                StringBuilder members = new StringBuilder("Members: ");
+                for (String sap : group.getMembers()) members.append(sap).append(", ");
+                String membersStr = members.toString();
+                holder.tvMembers.setText(membersStr.substring(0, membersStr.length() - 2));
+            } else {
+                holder.tvMembers.setText("Members: None");
+            }
 
             holder.btnDelete.setOnClickListener(v -> {
                 db.collection("groups").document(group.getId()).delete().addOnSuccessListener(aVoid -> loadGroups());
@@ -129,11 +140,11 @@ public class ManageGroupsActivity extends BaseActivity {
         public int getItemCount() { return list.size(); }
 
         class ViewHolder extends RecyclerView.ViewHolder {
-            TextView tvName, tvStatus, tvMembers;
+            TextView tvId, tvStatus, tvMembers;
             MaterialButton btnDelete;
             ViewHolder(View v) {
                 super(v);
-                tvName = v.findViewById(R.id.tvManageGroupName);
+                tvId = v.findViewById(R.id.tvManageGroupId);
                 tvStatus = v.findViewById(R.id.tvManageGroupStatus);
                 tvMembers = v.findViewById(R.id.tvManageGroupMembers);
                 btnDelete = v.findViewById(R.id.btnDeleteGroup);

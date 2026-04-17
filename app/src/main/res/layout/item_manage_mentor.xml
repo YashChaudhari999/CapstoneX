@@ -13,76 +13,62 @@
         android:padding="16dp">
 
         <TextView
-            android:id="@+id/tvManageGroupId"
+            android:id="@+id/tvMentorName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Group ID: #12345"
+            android:text="Mentor Name"
             style="@style/Capstone.Text.SectionHeader"
-            app:layout_constraintEnd_toStartOf="@+id/tvManageGroupStatus"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tvManageGroupStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/colorMainBg"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="2dp"
-            android:text="PENDING"
-            android:textColor="@color/colorAccentOrange"
-            android:textSize="10sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tvManageGroupMembers"
+            android:id="@+id/tvMentorDomain"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Members: 700123456, 700123457..."
-            style="@style/Capstone.Text.Muted"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvManageGroupId" />
-
-        <TextView
-            android:id="@+id/tvManageGroupMentor"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Mentor: Not Assigned"
+            android:text="Domain: AI &amp; Machine Learning"
             style="@style/Capstone.Text.Body"
             android:textSize="13sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvManageGroupMembers" />
+            app:layout_constraintTop_toBottomOf="@id/tvMentorName" />
+
+        <TextView
+            android:id="@+id/tvAssignedGroups"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Assigned Groups: #12345, #67890"
+            style="@style/Capstone.Text.Muted"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvMentorDomain" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAssignMentor"
+            android:id="@+id/btnViewMentorProfile"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="ASSIGN MENTOR"
+            android:text="VIEW PROFILE"
             android:textColor="@color/colorLearningNavy"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvManageGroupMentor" />
+            app:layout_constraintTop_toBottomOf="@id/tvAssignedGroups" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnDeleteGroup"
+            android:id="@+id/btnDeleteMentor"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="DELETE"
+            android:text="REMOVE"
             android:textColor="@color/colorDashboardRed"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/btnAssignMentor" />
+            app:layout_constraintTop_toTopOf="@id/btnViewMentorProfile" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
