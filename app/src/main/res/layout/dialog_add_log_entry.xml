@@ -39,19 +39,16 @@
             android:layout_marginTop="16dp"
             android:background="@color/colorOuterBg" />
 
-        <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:fillViewport="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorCardBg"
                 android:orientation="vertical"
-                android:padding="24dp">
+                android:paddingTop="16dp">
 
                 <!-- Work Carried Out Input -->
                 <com.google.android.material.textfield.TextInputLayout
@@ -74,37 +71,64 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- From Date Input -->
-                <TextView
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="From Date" />
+                    android:layout_marginTop="12dp"
+                    android:hint="From Date">
 
-                <CalendarView
-                    android:id="@+id/etFromDate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="false"
-                    android:hint="From Date"
-                    android:textColor="@color/colorBodyText"
-                    tools:ignore="RtlSymmetry" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etFromDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="false"
+                        android:drawableEnd="@drawable/ic_calendar" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- To Date Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="To Date">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etToDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="false"
+                        android:drawableEnd="@drawable/ic_calendar" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Document Upload Section -->
                 <TextView
+                    style="@style/Capstone.Text.SectionHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="SUPPORTING DOCUMENT" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnUploadDocument"
+                    style="@style/Widget.Capstone.Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="To Date" />
+                    android:text="Upload Document (PDF)"
+                    app:icon="@drawable/ic_plus" />
 
-                <CalendarView
-                    android:id="@+id/etToDate"
+                <TextView
+                    android:id="@+id/tvSelectedDocName"
+                    style="@style/Capstone.Text.Muted"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="false"
-                    android:hint="To Date"
-                    android:textColor="@color/colorBodyText"
-                    tools:ignore="RtlSymmetry" />
-
+                    android:layout_marginTop="4dp"
+                    android:text="No document selected"
+                    android:visibility="visible" />
 
                 <!-- Action Buttons -->
                 <LinearLayout
