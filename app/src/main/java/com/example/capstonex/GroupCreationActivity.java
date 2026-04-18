@@ -10,7 +10,6 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,9 +20,14 @@ import java.util.Set;
 
 public class GroupCreationActivity extends BaseActivity {
 
-    private TextInputEditText etLeaderSap, etMember2Sap, etMember3Sap, etMember4Sap;
-    private TextInputLayout tilMember2, tilMember3, tilMember4;
+    private TextInputEditText etLeaderSap, etLeaderName, etLeaderRoll;
+    private TextInputEditText etMember2Sap, etMember2Name, etMember2Roll;
+    private TextInputEditText etMember3Sap, etMember3Name, etMember3Roll;
+    private TextInputEditText etMember4Sap, etMember4Name, etMember4Roll;
+    
+    private View tilMember2, tilMember3, tilMember4;
     private MaterialButton btnAddMember, btnRemoveMember, btnCreateGroup;
+    
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private int memberCount = 1;
@@ -37,14 +41,25 @@ public class GroupCreationActivity extends BaseActivity {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        // Initialize views
+        // Initialize leader views
         etLeaderSap = findViewById(R.id.etLeaderSap);
-        etMember2Sap = findViewById(R.id.etMember2Sap);
-        etMember3Sap = findViewById(R.id.etMember3Sap);
-        etMember4Sap = findViewById(R.id.etMember4Sap);
+        etLeaderName = findViewById(R.id.etLeaderName);
+        etLeaderRoll = findViewById(R.id.etLeaderRoll);
 
+        // Initialize member views
+        etMember2Sap = findViewById(R.id.etMember2Sap);
+        etMember2Name = findViewById(R.id.etMember2Name);
+        etMember2Roll = findViewById(R.id.etMember2Roll);
         tilMember2 = findViewById(R.id.tilMember2);
+
+        etMember3Sap = findViewById(R.id.etMember3Sap);
+        etMember3Name = findViewById(R.id.etMember3Name);
+        etMember3Roll = findViewById(R.id.etMember3Roll);
         tilMember3 = findViewById(R.id.tilMember3);
+
+        etMember4Sap = findViewById(R.id.etMember4Sap);
+        etMember4Name = findViewById(R.id.etMember4Name);
+        etMember4Roll = findViewById(R.id.etMember4Roll);
         tilMember4 = findViewById(R.id.tilMember4);
 
         btnAddMember = findViewById(R.id.btnAddMember);
@@ -75,78 +90,87 @@ public class GroupCreationActivity extends BaseActivity {
     private void removeMemberField() {
         if (memberCount == 4) {
             tilMember4.setVisibility(View.GONE);
-            etMember4Sap.setText("");
+            clearMemberFields(etMember4Sap, etMember4Name, etMember4Roll);
             btnAddMember.setVisibility(View.VISIBLE);
             memberCount--;
         } else if (memberCount == 3) {
             tilMember3.setVisibility(View.GONE);
-            etMember3Sap.setText("");
+            clearMemberFields(etMember3Sap, etMember3Name, etMember3Roll);
             memberCount--;
         } else if (memberCount == 2) {
             tilMember2.setVisibility(View.GONE);
-            etMember2Sap.setText("");
+            clearMemberFields(etMember2Sap, etMember2Name, etMember2Roll);
             btnRemoveMember.setVisibility(View.GONE);
             memberCount--;
         }
     }
 
+    private void clearMemberFields(TextInputEditText sap, TextInputEditText name, TextInputEditText roll) {
+        sap.setText("");
+        name.setText("");
+        roll.setText("");
+    }
+
     private void validateAndCreateGroup() {
-        String leaderSap = etLeaderSap.getText().toString().trim();
-        if (leaderSap.isEmpty()) {
-            etLeaderSap.setError("Leader SAP ID required");
-            return;
-        }
+        List<Map<String, String>> memberList = new ArrayList<>();
+        Set<String> sapIds = new HashSet<>();
 
-        List<String> memberList = new ArrayList<>();
-        memberList.add(leaderSap);
+        // Add leader
+        if (!addMemberToList(etLeaderSap, etLeaderName, etLeaderRoll, memberList, sapIds)) return;
 
-        if (tilMember2.getVisibility() == View.VISIBLE) {
-            String val = etMember2Sap.getText().toString().trim();
-            if (val.isEmpty()) { etMember2Sap.setError("Required"); return; }
-            memberList.add(val);
-        }
-        if (tilMember3.getVisibility() == View.VISIBLE) {
-            String val = etMember3Sap.getText().toString().trim();
-            if (val.isEmpty()) { etMember3Sap.setError("Required"); return; }
-            memberList.add(val);
-        }
-        if (tilMember4.getVisibility() == View.VISIBLE) {
-            String val = etMember4Sap.getText().toString().trim();
-            if (val.isEmpty()) { etMember4Sap.setError("Required"); return; }
-            memberList.add(val);
-        }
-
-        // Check for duplicate SAP IDs
-        Set<String> uniqueCheck = new HashSet<>(memberList);
-        if (uniqueCheck.size() < memberList.size()) {
-            Toast.makeText(this, "Duplicate SAP IDs are not allowed", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        // Add extra members
+        if (tilMember2.getVisibility() == View.VISIBLE) 
+            if (!addMemberToList(etMember2Sap, etMember2Name, etMember2Roll, memberList, sapIds)) return;
+        if (tilMember3.getVisibility() == View.VISIBLE) 
+            if (!addMemberToList(etMember3Sap, etMember3Name, etMember3Roll, memberList, sapIds)) return;
+        if (tilMember4.getVisibility() == View.VISIBLE) 
+            if (!addMemberToList(etMember4Sap, etMember4Name, etMember4Roll, memberList, sapIds)) return;
 
         createGroupInFirestore(memberList);
     }
 
-    private void createGroupInFirestore(List<String> members) {
+    private boolean addMemberToList(TextInputEditText etSap, TextInputEditText etName, TextInputEditText etRoll, List<Map<String, String>> list, Set<String> sapIds) {
+        String sap = etSap.getText().toString().trim();
+        String name = etName.getText().toString().trim();
+        String roll = etRoll.getText().toString().trim();
+
+        if (sap.isEmpty() || name.isEmpty() || roll.isEmpty()) {
+            Toast.makeText(this, "Please fill all visible fields", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (sapIds.contains(sap)) {
+            Toast.makeText(this, "Duplicate SAP ID: " + sap, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        Map<String, String> member = new HashMap<>();
+        member.put("sapId", sap);
+        member.put("name", name);
+        member.put("rollNo", roll);
+        list.add(member);
+        sapIds.add(sap);
+        return true;
+    }
+
+    private void createGroupInFirestore(List<Map<String, String>> members) {
         btnCreateGroup.setEnabled(false);
         btnCreateGroup.setText("Creating...");
 
         String currentUid = mAuth.getUid();
         Map<String, Object> group = new HashMap<>();
         group.put("leaderUid", currentUid);
-        group.put("members", members);
+        group.put("memberDetails", members);
         group.put("createdAt", Timestamp.now());
         group.put("status", "Pending Title Approval");
 
-        // Use a WriteBatch to ensure both the group is created and user is updated
         db.collection("groups").add(group)
                 .addOnSuccessListener(ref -> {
                     String groupId = ref.getId();
-
-                    // Update user's group status
                     db.collection("users").document(currentUid)
                             .update("hasGroup", true, "groupId", groupId)
                             .addOnSuccessListener(aVoid -> {
-                                Toast.makeText(this, "Group Created! Proceed to Title Approval.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(this, "Group Created Successfully!", Toast.LENGTH_LONG).show();
                                 finish();
                             });
                 })

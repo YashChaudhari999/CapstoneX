@@ -65,67 +65,202 @@
                         style="@style/Capstone.Text.CardLabel"
                         android:textStyle="bold" />
 
-                    <!-- Leader is always required -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                    <!-- Member 1 (Leader) -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:hint="Leader SAP ID (Member 1)">
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etLeaderSap"
+                        android:orientation="vertical"
+                        android:layout_marginTop="16dp">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="number" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:hint="Leader SAP ID (Member 1)">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etLeaderSap"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="number" />
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Dynamic Members initially GONE -->
-                    <com.google.android.material.textfield.TextInputLayout
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:hint="Full Name">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etLeaderName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textPersonName" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:hint="Roll No">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etLeaderRoll"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="text" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <!-- Member 2 -->
+                    <LinearLayout
                         android:id="@+id/tilMember2"
-                        style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:hint="Member 2 SAP ID"
+                        android:orientation="vertical"
+                        android:layout_marginTop="16dp"
                         android:visibility="gone">
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etMember2Sap"
+
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/colorOuterBg" android:layout_marginBottom="16dp"/>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="number" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:hint="Member 2 SAP ID">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etMember2Sap"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="number" />
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:hint="Full Name">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etMember2Name"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textPersonName" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:hint="Roll No">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etMember2Roll"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="text" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <!-- Member 3 -->
+                    <LinearLayout
                         android:id="@+id/tilMember3"
-                        style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:hint="Member 3 SAP ID"
+                        android:orientation="vertical"
+                        android:layout_marginTop="16dp"
                         android:visibility="gone">
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etMember3Sap"
+
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/colorOuterBg" android:layout_marginBottom="16dp"/>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="number" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:hint="Member 3 SAP ID">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etMember3Sap"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="number" />
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:hint="Full Name">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etMember3Name"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textPersonName" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:hint="Roll No">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etMember3Roll"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="text" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <!-- Member 4 -->
+                    <LinearLayout
                         android:id="@+id/tilMember4"
-                        style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:hint="Member 4 SAP ID"
+                        android:orientation="vertical"
+                        android:layout_marginTop="16dp"
                         android:visibility="gone">
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etMember4Sap"
+
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/colorOuterBg" android:layout_marginBottom="16dp"/>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="number" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:hint="Member 4 SAP ID">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etMember4Sap"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="number" />
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Control Buttons Row -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:hint="Full Name">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etMember4Name"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textPersonName" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:hint="Roll No">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etMember4Roll"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="text" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -164,7 +299,7 @@
                         style="@style/Widget.Capstone.Button"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginTop="16dp"
                         android:text="CREATE GROUP" />
 
                 </LinearLayout>
