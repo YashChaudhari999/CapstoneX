@@ -2,6 +2,7 @@ package com.example.capstonex;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -22,21 +24,11 @@ import com.google.firebase.database.ValueEventListener;
  * StudentDashboardActivity — CapstonX
  * <p>
  * Loads the logged-in student's data from Realtime DB → Users/{uid}
- * and populates the dashboard with real information:
+ * and populates the dashboard with real information.
  * <p>
- * tvStudentName    → "Hi, {firstName}!" greeting
- * cvToolbarProfile → profile photo loaded via Glide from profileImageUrl
- * pbOverall        → project progress (read from Users/{uid}/progress)
- * tvProgressPercent→ "X% Completed"
- * <p>
- * XML IDs (activity_student_dashboard.xml):
- * toolbar, tvStudentName, cvToolbarProfile (ImageView inside),
- * ivNotifications, pbOverall, tvProgressPercent,
- * tileTimeline, tileDocuments, tileCreateGroup,
- * bottom_navigation
- * <p>
- * Realtime DB fields read:
- * Users/{uid}/name, profileImageUrl, sapId, rollNo, branch, progress
+ * Tile visibility logic:
+ * • hasGroup == false/null  → tileCreateGroup VISIBLE, tileViewGroup GONE,  tileTitleApproval GONE
+ * • hasGroup == true        → tileCreateGroup GONE,    tileViewGroup VISIBLE, tileTitleApproval VISIBLE
  */
 public class StudentDashboardActivity extends BaseActivity {
 
@@ -47,6 +39,11 @@ public class StudentDashboardActivity extends BaseActivity {
     private TextView tvStudentName, tvProgressPercent;
     private ImageView ivToolbarAvatar;
     private ProgressBar pbOverall;
+
+    // Tiles
+    private MaterialCardView tileCreateGroup;
+    private MaterialCardView tileViewGroup;
+    private MaterialCardView tileTitleApproval;
 
     // ── Firebase ───────────────────────────────────────────────────────────
     private FirebaseAuth mAuth;
@@ -77,8 +74,22 @@ public class StudentDashboardActivity extends BaseActivity {
         pbOverall = findViewById(R.id.pbOverall);
         ivToolbarAvatar = findViewById(R.id.ivToolbarAvatar);
 
+        tileCreateGroup = findViewById(R.id.tileCreateGroup);
+        tileViewGroup = findViewById(R.id.tileViewGroup);
+        tileTitleApproval = findViewById(R.id.tileTitleApproval);
+
         // ── Load user data from Realtime DB ────────────────────────────────
         loadUserData();
+
+        // ── Tile click listeners ───────────────────────────────────────────
+        tileCreateGroup.setOnClickListener(
+                v -> navigateTo(GroupCreationActivity.class));
+
+        tileViewGroup.setOnClickListener(
+                v -> navigateTo(GroupViewActivity.class));  // show group details
+
+        tileTitleApproval.setOnClickListener(
+                v -> navigateTo(TopicApprovalActivity.class));
 
         // ── Bottom Navigation ──────────────────────────────────────────────
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
@@ -106,13 +117,11 @@ public class StudentDashboardActivity extends BaseActivity {
         findViewById(R.id.cvToolbarProfile).setOnClickListener(
                 v -> navigateTo(ProfileActivity.class));
 
-        // ── Dashboard tiles ────────────────────────────────────────────────
+        // ── Other dashboard tiles ──────────────────────────────────────────
         findViewById(R.id.tileTimeline).setOnClickListener(
                 v -> navigateTo(ProjectTimelineActivity.class));
         findViewById(R.id.tileDocuments).setOnClickListener(
                 v -> navigateTo(DocumentsActivity.class));
-        findViewById(R.id.tileCreateGroup).setOnClickListener(
-                v -> navigateTo(GroupCreationActivity.class));
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -127,7 +136,6 @@ public class StudentDashboardActivity extends BaseActivity {
                 // ── Name greeting ─────────────────────────────────────────
                 String fullName = snapshot.child("name").getValue(String.class);
                 if (fullName != null && !fullName.isEmpty()) {
-                    // Show only first name for a friendly greeting
                     String firstName = fullName.split(" ")[0];
                     tvStudentName.setText("Hi, " + firstName + " 👋");
                 } else {
@@ -148,19 +156,40 @@ public class StudentDashboardActivity extends BaseActivity {
                 }
 
                 // ── Project progress ──────────────────────────────────────
-                // Read from Users/{uid}/progress (0–100), default 0
                 Integer progress = snapshot.child("progress").getValue(Integer.class);
                 if (progress == null) progress = 0;
                 pbOverall.setProgress(progress);
                 tvProgressPercent.setText(progress + "% Completed");
+
+                // ── Group state: toggle tiles ─────────────────────────────
+                Boolean hasGroup = snapshot.child("hasGroup").getValue(Boolean.class);
+                updateGroupTiles(Boolean.TRUE.equals(hasGroup));
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Keep default placeholder text — don't crash
                 tvStudentName.setText("Student Dashboard");
+                // Keep default tile state (Register Group visible)
             }
         });
+    }
+
+    /**
+     * Switches dashboard tiles based on whether the student belongs to a group.
+     *
+     * @param inGroup true  → show "View Group" + "Topic Approval", hide "Register Group"
+     *                false → show "Register Group", hide the other two
+     */
+    private void updateGroupTiles(boolean inGroup) {
+        if (inGroup) {
+            tileCreateGroup.setVisibility(View.GONE);
+            tileViewGroup.setVisibility(View.VISIBLE);
+            tileTitleApproval.setVisibility(View.VISIBLE);
+        } else {
+            tileCreateGroup.setVisibility(View.VISIBLE);
+            tileViewGroup.setVisibility(View.GONE);
+            tileTitleApproval.setVisibility(View.GONE);
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────

@@ -46,6 +46,7 @@
         <activity android:name=".SupportActivity" />
         <activity android:name=".ChangePasswordActivity" />
         <activity android:name=".ManageGroupsActivity" />
+        <activity android:name=".GroupViewActivity" />
         <activity android:name=".ManageMentorsActivity" />
 
     </application>
