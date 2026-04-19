@@ -1,5 +1,6 @@
 package com.example.capstonex;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +43,19 @@ public class LogbookAdapter extends RecyclerView.Adapter<LogbookAdapter.ViewHold
             holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.colorAccentOrange));
         }
 
-        // Grade and Remark can be added here if they exist in the model
+        // Handle VIEW DETAILS click
+        holder.btnSignLog.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), LogbookDetailsActivity.class);
+            // Pass all necessary data to the details page
+            intent.putExtra("fromDate", log.getFromDate());
+            intent.putExtra("toDate", log.getToDate());
+            intent.putExtra("workDone", log.getWorkDone());
+            intent.putExtra("isSigned", log.isSigned());
+            // Add other fields (learning, issues, etc.) if they exist in LogEntryModel
+            holder.itemView.getContext().startActivity(intent);
+        });
+
+        // Hide unused summary views in the list item
         holder.tvGrade.setVisibility(View.GONE); 
         holder.tvMentorRemarkLabel.setVisibility(View.GONE);
         holder.tvMentorRemark.setVisibility(View.GONE);
