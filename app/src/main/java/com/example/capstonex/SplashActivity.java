@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 
@@ -61,6 +62,10 @@ public class SplashActivity extends BaseActivity {
                 SPLASH_DELAY
         );
     }
+
+    private void applySystemWindowInsets(View viewById) {
+    }
+
 
     // ─────────────────────────────────────────────────────────────────────
     // Check Firebase Auth session
