@@ -61,6 +61,7 @@
         <activity android:name=".ManageMentorsActivity" />
         <activity android:name=".ChatActivity" />
         <activity android:name=".LogbookDetailsActivity" />
+        <activity android:name=".AddDomainActivity" />
 
     </application>
 

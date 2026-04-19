@@ -84,9 +84,7 @@ public class AdminDashboardActivity extends BaseActivity {
                     startActivity(intent);
                     finish();
                 } else if (id == R.id.nav_manage_groups) {
-                    Intent intent = new Intent(AdminDashboardActivity.this, ManageGroupsActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    navigateTo(ManageGroupsActivity.class);
                 }
                 
                 drawerLayout.closeDrawer(GravityCompat.START);
@@ -118,7 +116,18 @@ public class AdminDashboardActivity extends BaseActivity {
         btnAddStudents.setOnClickListener(v -> openFilePicker(REQ_PICK_STUDENTS));
         btnAddMentors.setOnClickListener(v -> openFilePicker(REQ_PICK_MENTORS));
 
+        // Connect tiles to activities
+        findViewById(R.id.cardGroups).setOnClickListener(v -> navigateTo(ManageGroupsActivity.class));
+        findViewById(R.id.cardMentors).setOnClickListener(v -> navigateTo(ManageMentorsActivity.class));
+        findViewById(R.id.cardAddDomain).setOnClickListener(v -> navigateTo(AddDomainActivity.class));
+
         loadOverviewCounts();
+    }
+
+    private void navigateTo(Class<?> cls) {
+        Intent intent = new Intent(this, cls);
+        startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
     private void openFilePicker(int requestCode) {
