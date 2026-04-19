@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!-- ═══ res/layout/dialog_add_log_entry.xml (Fixed Overlap) ═══ -->
+<?xml version="1.0" encoding="utf-8"?><!-- ═══ res/layout/dialog_add_log_entry.xml ═══ -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical"
@@ -18,6 +17,7 @@
         android:orientation="vertical"
         android:padding="24dp">
 
+        <!-- ── Title ── -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -39,6 +39,7 @@
             android:layout_marginTop="16dp"
             android:background="@color/colorOuterBg" />
 
+        <!-- ── Scrollable Form ── -->
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,7 +51,7 @@
                 android:orientation="vertical"
                 android:paddingTop="16dp">
 
-                <!-- Work Carried Out Input -->
+                <!-- Work Carried Out -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
@@ -70,7 +71,7 @@
                         android:textColor="@color/colorBodyText" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- From Date Input -->
+                <!-- From Date -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
@@ -83,11 +84,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:clickable="true"
-                        android:focusable="false"
-                        android:drawableEnd="@drawable/ic_calendar" />
+                        android:drawableEnd="@drawable/ic_calendar"
+                        android:focusable="false" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- To Date Input -->
+                <!-- To Date -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
@@ -100,37 +101,106 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:clickable="true"
-                        android:focusable="false"
-                        android:drawableEnd="@drawable/ic_calendar" />
+                        android:drawableEnd="@drawable/ic_calendar"
+                        android:focusable="false" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Document Upload Section -->
+                <!-- ── Supporting Documents Section ── -->
                 <TextView
                     style="@style/Capstone.Text.SectionHeader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:layout_marginBottom="8dp"
-                    android:text="SUPPORTING DOCUMENT" />
+                    android:text="SUPPORTING DOCUMENTS" />
 
+                <!-- Upload Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnUploadDocument"
                     style="@style/Widget.Capstone.Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Upload Document (PDF)"
+                    android:text="Upload Files (Any Format, Multiple)"
                     app:icon="@drawable/ic_plus" />
 
+                <!-- File Count Label -->
                 <TextView
                     android:id="@+id/tvSelectedDocName"
                     style="@style/Capstone.Text.Muted"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="No document selected"
+                    android:layout_marginTop="6dp"
+                    android:text="No files selected"
                     android:visibility="visible" />
 
-                <!-- Action Buttons -->
+                <!-- ── Selected Files List Card ── -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardSelectedFiles"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/colorOuterBg"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/colorLearningNavy"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <!-- Header row inside card -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Selected Files"
+                                android:textColor="@color/colorLearningNavy"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <!-- Clear All button -->
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnClearFiles"
+                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:minHeight="0dp"
+                                android:paddingHorizontal="4dp"
+                                android:paddingVertical="0dp"
+                                android:text="Clear All"
+                                android:textColor="@color/colorMutedText"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="6dp"
+                            android:layout_marginBottom="8dp"
+                            android:alpha="0.2"
+                            android:background="@color/colorMutedText" />
+
+                        <!-- Dynamic file name rows injected here from Java -->
+                        <LinearLayout
+                            android:id="@+id/llSelectedFilesContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ── Action Buttons ── -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -155,6 +225,7 @@
                         android:paddingHorizontal="24dp"
                         android:text="@string/btn_add_entry" />
                 </LinearLayout>
+
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
