@@ -1,6 +1,6 @@
 <!-- ═══ res/values/strings.xml ═══ -->
 <resources>
-    <string name="app_name">CapstoneX</string>
+    <string name="app_name">Capstone Portal</string>
     <string name="university_name">SVKM\'s NMIMS</string>
     <string name="dept_full_name">MPSTME · Project Management</string>
     <string name="location_address">Vile Parle (W), Mumbai – 400 056</string>
@@ -41,6 +41,8 @@
     <string name="btn_view_logs">View Logs</string>
     <string name="btn_evaluate">Evaluate →</string>
     <string name="btn_download">Download Marks</string>
+    <string name="btn_next">Next</string>
+    <string name="btn_back">Back</string>
 
     <!-- Hints & Placeholders -->
     <string name="hint_email">Email Address</string>
@@ -53,6 +55,7 @@
     <string name="hint_idea">Brief Idea</string>
     <string name="hint_search">Search Groups...</string>
     <string name="hint_work_carried_out">Work Carried Out</string>
+    <string name="hint_short_desc">Project Short Description</string>
 
     <!-- Sections -->
     <string name="section_dept_program">DEPARTMENT &amp; PROGRAM</string>
@@ -95,6 +98,16 @@
         <item>Review 3 (R3)</item>
         <item>Internal Progress</item>
         <item>Research Paper</item>
+    </string-array>
+
+    <string-array name="domains">
+        <item>AI &amp; Machine Learning</item>
+        <item>Data Science</item>
+        <item>Cybersecurity</item>
+        <item>IoT &amp; Robotics</item>
+        <item>Web/Mobile App Dev</item>
+        <item>Blockchain</item>
+        <item>Cloud Computing</item>
     </string-array>
 
     <!-- Dashboards -->
