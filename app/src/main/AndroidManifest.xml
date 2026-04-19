@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Essential Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <application
         android:name=".CloudinaryManager"
@@ -21,6 +31,7 @@
             </intent-filter>
         </activity>
 
+        <!-- Registered All App Activities -->
         <activity android:name=".LoginActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".StudentDashboardActivity" />
@@ -48,6 +59,8 @@
         <activity android:name=".ManageGroupsActivity" />
         <activity android:name=".GroupViewActivity" />
         <activity android:name=".ManageMentorsActivity" />
+        <activity android:name=".ChatActivity" />
+        <activity android:name=".LogbookDetailsActivity" />
 
     </application>
 
