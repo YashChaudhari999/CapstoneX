@@ -47,7 +47,6 @@ public class AddDomainActivity extends BaseActivity {
 
     private DomainAdapter adapter;
     private DatabaseReference mDatabase;
-    private ValueEventListener domainsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +110,11 @@ public class AddDomainActivity extends BaseActivity {
                 adapter.notifyDataSetChanged();
                 updateCountLabel();
                 tvEmptyState.setVisibility(domainList.isEmpty() ? View.VISIBLE : View.GONE);
+                
+                // Initially show in viewing mode if domains exist
+                if (!domainList.isEmpty()) {
+                    toggleEditing(false);
+                }
             }
 
             @Override
@@ -129,7 +133,7 @@ public class AddDomainActivity extends BaseActivity {
             return;
         }
 
-        // Add to local list only
+        // Add to local list only - ID will be assigned by DB index or ignored for simple list
         DomainModel newDomain = new DomainModel(null, name);
         domainList.add(newDomain);
         adapter.notifyDataSetChanged();
@@ -137,7 +141,6 @@ public class AddDomainActivity extends BaseActivity {
         etDomainName.setText("");
         updateCountLabel();
         tvEmptyState.setVisibility(View.GONE);
-        Toast.makeText(this, "Domain added to list", Toast.LENGTH_SHORT).show();
     }
 
     private void onDeleteRequested(DomainModel domain) {
@@ -154,8 +157,8 @@ public class AddDomainActivity extends BaseActivity {
         }
         
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Save Domains")
-                .setMessage("Save all current domains to the database?")
+                .setTitle("Save Changes")
+                .setMessage("Save all domains to the database?")
                 .setPositiveButton("Save", (d, w) -> saveToDatabase())
                 .setNegativeButton("Cancel", null)
                 .show();
@@ -165,7 +168,7 @@ public class AddDomainActivity extends BaseActivity {
         btnSubmitDomains.setEnabled(false);
         btnSubmitDomains.setText("Saving...");
 
-        // Overwrite the Domains node with the current local list
+        // Store the entire list under the Domains node
         mDatabase.child("Domains").setValue(domainList).addOnCompleteListener(task -> {
             btnSubmitDomains.setEnabled(true);
             btnSubmitDomains.setText("SUBMIT DOMAINS");
@@ -188,12 +191,7 @@ public class AddDomainActivity extends BaseActivity {
 
     private void updateCountLabel() {
         int n = domainList.size();
-        tvDomainCount.setText(n + (n == 1 ? " domain" : " domains") + " added");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+        tvDomainCount.setText(n + (n == 1 ? " domain" : " domains") + " total");
     }
 
     // --- Adapter ---

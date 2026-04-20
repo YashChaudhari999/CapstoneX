@@ -21,7 +21,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TopicApprovalActivity extends BaseActivity {
@@ -113,11 +115,35 @@ public class TopicApprovalActivity extends BaseActivity {
     }
 
     private void setupDomainDropdowns() {
-        String[] domains = getResources().getStringArray(R.array.domains);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, domains);
-        actDomain1.setAdapter(adapter);
-        actDomain2.setAdapter(adapter);
-        actDomain3.setAdapter(adapter);
+        mDatabase.child("Domains").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<String> domainNames = new ArrayList<>();
+                for (DataSnapshot domainSnap : snapshot.getChildren()) {
+                    DomainModel domain = domainSnap.getValue(DomainModel.class);
+                    if (domain != null && domain.getName() != null) {
+                        domainNames.add(domain.getName());
+                    }
+                }
+                
+                if (domainNames.isEmpty()) {
+                    // Fallback to resources if DB is empty or use a placeholder
+                    domainNames.add("No Domains Available");
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(TopicApprovalActivity.this, 
+                        android.R.layout.simple_list_item_1, domainNames);
+                
+                actDomain1.setAdapter(adapter);
+                actDomain2.setAdapter(adapter);
+                actDomain3.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(TopicApprovalActivity.this, "Failed to load domains", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private boolean validateStep(int step) {
