@@ -48,6 +48,7 @@
         <activity android:name=".ManageGroupsActivity" />
         <activity android:name=".GroupViewActivity" />
         <activity android:name=".ManageMentorsActivity" />
+        <activity android:name=".AddDomainActivity" />
 
     </application>
 

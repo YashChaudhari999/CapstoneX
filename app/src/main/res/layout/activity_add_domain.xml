@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorMainBg">
 
+    <!-- ── Top App Bar ───────────────────────────────────────────────────── -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,9 +18,9 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="1dp"
             android:minHeight="?attr/actionBarSize"
             android:paddingTop="35dp"
-            android:layout_marginBottom="1dp"
             app:navigationIcon="@drawable/ic_back"
             app:navigationIconTint="#FFFFFF">
 
@@ -27,13 +28,14 @@
                 android:id="@+id/tvToolbarTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="CapstoneX Manage Domain"
+                android:text="Manage Domains"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
                 android:textStyle="bold" />
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
+    <!-- ── Scrollable body ───────────────────────────────────────────────── -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -45,6 +47,7 @@
             android:orientation="vertical"
             android:padding="24dp">
 
+            <!-- ── Add-domain input card (hidden once submitted) ────────── -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardAddDomainSection"
                 style="@style/Widget.Capstone.CardView"
@@ -59,13 +62,16 @@
                     android:padding="20dp">
 
                     <TextView
+                        style="@style/Capstone.Text.CardLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="DOMAIN MANAGEMENT"
-                        style="@style/Capstone.Text.CardLabel"
                         android:textStyle="bold" />
 
+                    <!-- TextInputLayout now has its own ID so the Java can
+                         call tilDomainName.setError() for inline field errors. -->
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilDomainName"
                         style="@style/Widget.Capstone.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -76,7 +82,9 @@
                             android:id="@+id/etDomainName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="text" />
+                            android:imeOptions="actionDone"
+                            android:inputType="textCapWords" />
+
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.button.MaterialButton
@@ -90,14 +98,57 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <TextView
-                style="@style/Capstone.Text.SectionHeader"
-                android:layout_width="wrap_content"
+            <!-- ── Section header row: label + live domain count ────────── -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:layout_marginBottom="12dp"
-                android:text="EXISTING DOMAINS" />
+                android:layout_marginBottom="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
+                <TextView
+                    style="@style/Capstone.Text.SectionHeader"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="EXISTING DOMAINS" />
+
+                <!-- Live count badge, e.g. "4 domains added" -->
+                <TextView
+                    android:id="@+id/tvDomainCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorMutedText"
+                    android:textSize="12sp"
+                    tools:text="3 domains added" />
+
+            </LinearLayout>
+
+            <!-- ── Loading spinner (visible while Firestore fetch is live) ─ -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:indeterminate="true"
+                android:visibility="gone" />
+
+            <!-- ── Empty-state label (visible when list is empty) ────────── -->
+            <TextView
+                android:id="@+id/tvEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:padding="16dp"
+                android:text="No domains added yet.\nTap ADD DOMAIN to get started."
+                android:textAlignment="center"
+                android:textColor="@color/colorMutedText"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <!-- ── Domain list ────────────────────────────────────────────── -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvDomains"
                 android:layout_width="match_parent"
@@ -105,13 +156,13 @@
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_domain" />
 
-            <!-- Action Buttons Footer -->
+            <!-- ── Footer action buttons ─────────────────────────────────── -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginTop="24dp"
-                android:layout_marginBottom="32dp">
+                android:layout_marginBottom="32dp"
+                android:orientation="vertical">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSubmitDomains"
@@ -125,10 +176,11 @@
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
+                    android:layout_marginTop="12dp"
                     android:text="EDIT DOMAINS"
+                    android:textColor="@color/colorDashboardRed"
                     android:visibility="gone"
-                    app:strokeColor="@color/colorDashboardRed"
-                    android:textColor="@color/colorDashboardRed" />
+                    app:strokeColor="@color/colorDashboardRed" />
 
             </LinearLayout>
 

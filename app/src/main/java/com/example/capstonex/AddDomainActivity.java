@@ -1,10 +1,13 @@
 package com.example.capstonex;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,185 +17,216 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.SetOptions;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AddDomainActivity extends BaseActivity {
 
-    private TextInputEditText etDomainName;
-    private RecyclerView rvDomains;
-    private DomainAdapter adapter;
-    private List<DomainModel> domainList;
-    private FirebaseFirestore db;
+    private static final String DB_URL = "https://capstonex-8b885-default-rtdb.firebaseio.com";
+    private final List<DomainModel> domainList = new ArrayList<>();
     
+    private TextInputLayout tilDomainName;
+    private TextInputEditText etDomainName;
     private MaterialCardView cardAddDomainSection;
-    private MaterialButton btnAddDomain, btnSubmitDomains, btnEditDomains;
+    private MaterialButton btnAddDomain;
+    private RecyclerView rvDomains;
+    private ProgressBar progressBar;
+    private TextView tvEmptyState;
+    private TextView tvDomainCount;
+    private MaterialButton btnSubmitDomains;
+    private MaterialButton btnEditDomains;
+
+    private DomainAdapter adapter;
+    private DatabaseReference mDatabase;
+    private ValueEventListener domainsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_domain);
-        setupEdgeToEdge(findViewById(R.id.add_domain_root));
 
-        db = FirebaseFirestore.getInstance();
+        mDatabase = FirebaseDatabase.getInstance(DB_URL).getReference();
+
+        bindViews();
+        setupRecyclerView();
+        setupClickListeners();
+        loadExistingDomains();
+    }
+
+    private void bindViews() {
+        tilDomainName = findViewById(R.id.tilDomainName);
         etDomainName = findViewById(R.id.etDomainName);
-        rvDomains = findViewById(R.id.rvDomains);
         cardAddDomainSection = findViewById(R.id.cardAddDomainSection);
         btnAddDomain = findViewById(R.id.btnAddDomain);
+        rvDomains = findViewById(R.id.rvDomains);
+        progressBar = findViewById(R.id.progressBar);
+        tvEmptyState = findViewById(R.id.tvEmptyState);
+        tvDomainCount = findViewById(R.id.tvDomainCount);
         btnSubmitDomains = findViewById(R.id.btnSubmitDomains);
         btnEditDomains = findViewById(R.id.btnEditDomains);
-        
-        domainList = new ArrayList<>();
-        adapter = new DomainAdapter(domainList);
+    }
+
+    private void setupRecyclerView() {
+        adapter = new DomainAdapter(domainList, this::onDeleteRequested);
         rvDomains.setLayoutManager(new LinearLayoutManager(this));
         rvDomains.setAdapter(adapter);
+    }
 
-        btnAddDomain.setOnClickListener(v -> addDomain());
+    private void setupClickListeners() {
         findViewById(R.id.toolbar).setOnClickListener(v -> finish());
-        
-        btnSubmitDomains.setOnClickListener(v -> submitDomains());
-        btnEditDomains.setOnClickListener(v -> enableEditing());
 
-        checkSubmissionStatus();
-        loadDomains();
+        btnAddDomain.setOnClickListener(v -> attemptAddDomain());
+        btnSubmitDomains.setOnClickListener(v -> confirmAndSubmit());
+        btnEditDomains.setOnClickListener(v -> toggleEditing(true));
+
+        etDomainName.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+            @Override public void onTextChanged(CharSequence s, int a, int b, int c) { tilDomainName.setError(null); }
+            @Override public void afterTextChanged(Editable s) {}
+        });
     }
 
-    private void addDomain() {
-        String name = etDomainName.getText().toString().trim();
-        if (name.isEmpty()) {
-            etDomainName.setError("Enter domain name");
-            return;
-        }
-
-        Map<String, Object> domain = new HashMap<>();
-        domain.put("name", name);
-        domain.put("createdAt", com.google.firebase.Timestamp.now());
-
-        db.collection("domains").add(domain)
-                .addOnSuccessListener(ref -> {
-                    Toast.makeText(this, "Domain Added", Toast.LENGTH_SHORT).show();
-                    etDomainName.setText("");
-                    loadDomains();
-                })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to add domain: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-    }
-
-    private void submitDomains() {
-        if (domainList.isEmpty()) {
-            Toast.makeText(this, "Please add at least one domain before submitting", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Map<String, Object> status = new HashMap<>();
-        status.put("isSubmitted", true);
-
-        db.collection("settings").document("domain_status")
-                .set(status)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Domains finalized and submitted!", Toast.LENGTH_SHORT).show();
-                    setViewState(true);
-                })
-                .addOnFailureListener(e -> Toast.makeText(this, "Submission failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-    }
-
-    private void enableEditing() {
-        Map<String, Object> status = new HashMap<>();
-        status.put("isSubmitted", false);
-
-        // Using set with merge is safer if the document state is uncertain
-        db.collection("settings").document("domain_status")
-                .set(status, SetOptions.merge())
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Editing enabled", Toast.LENGTH_SHORT).show();
-                    setViewState(false);
-                })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to enable editing: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-    }
-
-    private void checkSubmissionStatus() {
-        db.collection("settings").document("domain_status")
-                .addSnapshotListener((documentSnapshot, e) -> {
-                    if (documentSnapshot != null && documentSnapshot.exists()) {
-                        Boolean isSubmitted = documentSnapshot.getBoolean("isSubmitted");
-                        setViewState(isSubmitted != null && isSubmitted);
+    private void loadExistingDomains() {
+        progressBar.setVisibility(View.VISIBLE);
+        mDatabase.child("Domains").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                progressBar.setVisibility(View.GONE);
+                domainList.clear();
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    DomainModel domain = data.getValue(DomainModel.class);
+                    if (domain != null) {
+                        domainList.add(domain);
                     }
-                });
-    }
-
-    private void setViewState(boolean isSubmitted) {
-        if (isSubmitted) {
-            cardAddDomainSection.setVisibility(View.GONE);
-            btnSubmitDomains.setVisibility(View.GONE);
-            btnEditDomains.setVisibility(View.VISIBLE);
-            adapter.setCanDelete(false);
-        } else {
-            cardAddDomainSection.setVisibility(View.VISIBLE);
-            btnSubmitDomains.setVisibility(View.VISIBLE);
-            btnEditDomains.setVisibility(View.GONE);
-            adapter.setCanDelete(true);
-        }
-    }
-
-    private void loadDomains() {
-        db.collection("domains").orderBy("name", Query.Direction.ASCENDING)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    domainList.clear();
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        DomainModel model = doc.toObject(DomainModel.class);
-                        model.setId(doc.getId());
-                        domainList.add(model);
-                    }
-                    adapter.notifyDataSetChanged();
-                });
-    }
-
-    private class DomainAdapter extends RecyclerView.Adapter<DomainAdapter.ViewHolder> {
-        private List<DomainModel> list;
-        private boolean canDelete = true;
-        
-        DomainAdapter(List<DomainModel> list) { this.list = list; }
-
-        void setCanDelete(boolean canDelete) {
-            this.canDelete = canDelete;
-            notifyDataSetChanged();
-        }
-
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_domain, parent, false));
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            DomainModel domain = list.get(position);
-            holder.tvName.setText(domain.getName());
-            holder.btnDelete.setVisibility(canDelete ? View.VISIBLE : View.GONE);
-            holder.btnDelete.setOnClickListener(v -> {
-                db.collection("domains").document(domain.getId()).delete().addOnSuccessListener(aVoid -> loadDomains());
-            });
-        }
-
-        @Override
-        public int getItemCount() { return list.size(); }
-
-        class ViewHolder extends RecyclerView.ViewHolder {
-            TextView tvName;
-            ImageButton btnDelete;
-            ViewHolder(View v) {
-                super(v);
-                tvName = v.findViewById(R.id.tvDomainName);
-                btnDelete = v.findViewById(R.id.btnDeleteDomain);
+                }
+                adapter.notifyDataSetChanged();
+                updateCountLabel();
+                tvEmptyState.setVisibility(domainList.isEmpty() ? View.VISIBLE : View.GONE);
             }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(AddDomainActivity.this, "Failed to load domains", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void attemptAddDomain() {
+        String name = etDomainName.getText().toString().trim();
+
+        if (name.isEmpty()) {
+            tilDomainName.setError("Please enter a domain name");
+            return;
+        }
+
+        // Add to local list only
+        DomainModel newDomain = new DomainModel(null, name);
+        domainList.add(newDomain);
+        adapter.notifyDataSetChanged();
+        
+        etDomainName.setText("");
+        updateCountLabel();
+        tvEmptyState.setVisibility(View.GONE);
+        Toast.makeText(this, "Domain added to list", Toast.LENGTH_SHORT).show();
+    }
+
+    private void onDeleteRequested(DomainModel domain) {
+        domainList.remove(domain);
+        adapter.notifyDataSetChanged();
+        updateCountLabel();
+        if (domainList.isEmpty()) tvEmptyState.setVisibility(View.VISIBLE);
+    }
+
+    private void confirmAndSubmit() {
+        if (domainList.isEmpty()) {
+            Toast.makeText(this, "Add at least one domain", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Save Domains")
+                .setMessage("Save all current domains to the database?")
+                .setPositiveButton("Save", (d, w) -> saveToDatabase())
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void saveToDatabase() {
+        btnSubmitDomains.setEnabled(false);
+        btnSubmitDomains.setText("Saving...");
+
+        // Overwrite the Domains node with the current local list
+        mDatabase.child("Domains").setValue(domainList).addOnCompleteListener(task -> {
+            btnSubmitDomains.setEnabled(true);
+            btnSubmitDomains.setText("SUBMIT DOMAINS");
+            if (task.isSuccessful()) {
+                Toast.makeText(this, "Domains saved successfully!", Toast.LENGTH_SHORT).show();
+                toggleEditing(false);
+            } else {
+                Toast.makeText(this, "Failed to save", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void toggleEditing(boolean enabled) {
+        cardAddDomainSection.setVisibility(enabled ? View.VISIBLE : View.GONE);
+        btnSubmitDomains.setVisibility(enabled ? View.VISIBLE : View.GONE);
+        btnEditDomains.setVisibility(enabled ? View.GONE : View.VISIBLE);
+        adapter.setCanDelete(enabled);
+        adapter.notifyDataSetChanged();
+    }
+
+    private void updateCountLabel() {
+        int n = domainList.size();
+        tvDomainCount.setText(n + (n == 1 ? " domain" : " domains") + " added");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    // --- Adapter ---
+    interface OnDeleteListener { void onDelete(DomainModel domain); }
+
+    private static class DomainAdapter extends RecyclerView.Adapter<DomainAdapter.ViewHolder> {
+        private final List<DomainModel> list;
+        private final OnDeleteListener deleteListener;
+        private boolean canDelete = true;
+
+        DomainAdapter(List<DomainModel> list, OnDeleteListener listener) {
+            this.list = list;
+            this.deleteListener = listener;
+        }
+
+        void setCanDelete(boolean canDelete) { this.canDelete = canDelete; }
+
+        @NonNull @Override public ViewHolder onCreateViewHolder(@NonNull ViewGroup p, int vt) {
+            return new ViewHolder(LayoutInflater.from(p.getContext()).inflate(R.layout.item_domain, p, false));
+        }
+
+        @Override public void onBindViewHolder(@NonNull ViewHolder h, int p) {
+            DomainModel domain = list.get(p);
+            h.tvName.setText((p + 1) + ". " + domain.getName());
+            h.btnDelete.setVisibility(canDelete ? View.VISIBLE : View.GONE);
+            h.btnDelete.setOnClickListener(v -> deleteListener.onDelete(domain));
+        }
+
+        @Override public int getItemCount() { return list.size(); }
+
+        static class ViewHolder extends RecyclerView.ViewHolder {
+            TextView tvName; ImageButton btnDelete;
+            ViewHolder(View v) { super(v); tvName = v.findViewById(R.id.tvDomainName); btnDelete = v.findViewById(R.id.btnDeleteDomain); }
         }
     }
 }

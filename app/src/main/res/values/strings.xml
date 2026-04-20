@@ -1,6 +1,6 @@
 <!-- ═══ res/values/strings.xml ═══ -->
 <resources>
-    <string name="app_name">Capstone Portal</string>
+    <string name="app_name">CapstoneX</string>
     <string name="university_name">SVKM\'s NMIMS</string>
     <string name="dept_full_name">MPSTME · Project Management</string>
     <string name="location_address">Vile Parle (W), Mumbai – 400 056</string>
