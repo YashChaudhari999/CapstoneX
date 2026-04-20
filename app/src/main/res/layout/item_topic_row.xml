@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="5dp"
+    app:cardBackgroundColor="@color/colorMainBg"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/colorOuterBg"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Title row: numbered badge + title text + optional status pill -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- Topic number circle (T1 / T2 / T3) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardTopicNum"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                app:cardBackgroundColor="@color/colorAccentBlue"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp">
+
+                <TextView
+                    android:id="@+id/tvTopicNum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="T1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Topic title -->
+            <TextView
+                android:id="@+id/tvTopicTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:textColor="@color/colorBodyText"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="AI-Driven Student Performance Tracker" />
+
+            <!-- Decision status pill (hidden until a decision is made) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardTopicStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/colorAccentGreen"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/tvTopicStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="3dp"
+                    android:text="Approved"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <!-- Domain badge (TextView styled as a pill) -->
+        <TextView
+            android:id="@+id/tvDomainBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_chip_outline"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="3dp"
+            android:textColor="@color/colorMutedText"
+            android:textSize="11sp"
+            android:visibility="gone"
+            tools:text="Artificial Intelligence"
+            tools:visibility="visible" />
+
+        <!-- Description -->
+        <TextView
+            android:id="@+id/tvTopicDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:textColor="@color/colorMutedText"
+            android:textSize="12sp"
+            tools:text="A machine-learning system to analyse student performance from logbook data." />
+
+        <!-- Action buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnReject"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="80dp"
+                android:text="Reject"
+                android:textColor="@color/colorAccentRed"
+                android:textSize="12sp"
+                app:strokeColor="@color/colorAccentRed"
+                app:strokeWidth="1dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnApprove"
+                style="@style/Widget.Capstone.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="90dp"
+                android:text="Approve"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

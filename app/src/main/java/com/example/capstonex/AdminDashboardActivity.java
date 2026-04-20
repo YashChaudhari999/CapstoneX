@@ -85,6 +85,8 @@ public class AdminDashboardActivity extends BaseActivity {
                     finish();
                 } else if (id == R.id.nav_manage_groups) {
                     navigateTo(ManageGroupsActivity.class);
+                } else if (id == R.id.nav_topic_approval) {
+                    navigateTo(AdminTopicApprovalActivity.class);
                 }
                 
                 drawerLayout.closeDrawer(GravityCompat.START);
@@ -120,6 +122,7 @@ public class AdminDashboardActivity extends BaseActivity {
         findViewById(R.id.cardGroups).setOnClickListener(v -> navigateTo(ManageGroupsActivity.class));
         findViewById(R.id.cardMentors).setOnClickListener(v -> navigateTo(ManageMentorsActivity.class));
         findViewById(R.id.cardAddDomain).setOnClickListener(v -> navigateTo(AddDomainActivity.class));
+        findViewById(R.id.cardTopicApproval).setOnClickListener(v -> navigateTo(AdminTopicApprovalActivity.class));
 
         loadOverviewCounts();
     }

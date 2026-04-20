@@ -10,6 +10,10 @@
             android:icon="@drawable/ic_checklist"
             android:title="Manage Groups" />
         <item
+            android:id="@+id/nav_topic_approval"
+            android:icon="@drawable/ic_checklist"
+            android:title="Topic Approval" />
+        <item
             android:id="@+id/nav_reports"
             android:icon="@drawable/ic_book"
             android:title="Reports" />

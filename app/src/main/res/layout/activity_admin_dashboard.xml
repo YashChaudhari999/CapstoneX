@@ -165,7 +165,7 @@
                     </com.google.android.material.card.MaterialCardView>
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardAttendance"
+                        android:id="@+id/cardTopicApproval"
                         style="@style/Widget.Capstone.CardView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -184,7 +184,7 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="48dp"
                                 android:layout_height="48dp"
-                                app:cardBackgroundColor="@color/colorAccentGreen"
+                                app:cardBackgroundColor="@color/colorAccentOrange"
                                 app:cardCornerRadius="24dp"
                                 app:cardElevation="0dp">
 
@@ -201,7 +201,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="High Attendance" />
+                                android:text="Topic Approval"
+                                android:textStyle="bold" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
@@ -212,7 +213,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/cardAttendance"
+                        app:layout_constraintStart_toEndOf="@id/cardTopicApproval"
                         app:layout_constraintTop_toBottomOf="@id/cardMentors">
 
                         <LinearLayout

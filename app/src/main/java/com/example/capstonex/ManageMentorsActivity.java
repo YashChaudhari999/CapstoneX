@@ -1,6 +1,5 @@
 package com.example.capstonex;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,19 +15,24 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ManageMentorsActivity extends BaseActivity {
 
+    private static final String DB_URL = "https://capstonex-8b885-default-rtdb.firebaseio.com";
     private RecyclerView rvMentors;
     private MentorAdapter adapter;
     private List<MentorModel> mentorList;
     private List<MentorModel> filteredList;
-    private FirebaseFirestore db;
+    private DatabaseReference mDatabase;
     private EditText etSearch;
 
     @Override
@@ -37,7 +41,7 @@ public class ManageMentorsActivity extends BaseActivity {
         setContentView(R.layout.activity_manage_mentors);
         setupEdgeToEdge(findViewById(R.id.manage_mentors_root));
 
-        db = FirebaseFirestore.getInstance();
+        mDatabase = FirebaseDatabase.getInstance(DB_URL).getReference();
         rvMentors = findViewById(R.id.rvManageMentors);
         etSearch = findViewById(R.id.etSearchMentors);
         
@@ -49,7 +53,6 @@ public class ManageMentorsActivity extends BaseActivity {
         rvMentors.setAdapter(adapter);
 
         findViewById(R.id.fabAddMentor).setOnClickListener(v -> {
-            // Future: Open Add Mentor Dialog or Activity
             Toast.makeText(this, "Feature coming soon: Add Mentor", Toast.LENGTH_SHORT).show();
         });
 
@@ -72,23 +75,36 @@ public class ManageMentorsActivity extends BaseActivity {
     }
 
     private void loadMentors() {
-        db.collection("mentors").get().addOnSuccessListener(queryDocumentSnapshots -> {
-            mentorList.clear();
-            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                MentorModel model = doc.toObject(MentorModel.class);
-                model.setId(doc.getId());
-                mentorList.add(model);
+        mDatabase.child("Users").orderByChild("role").equalTo("mentor")
+                .addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                mentorList.clear();
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    MentorModel model = data.getValue(MentorModel.class);
+                    if (model != null) {
+                        model.setUid(data.getKey());
+                        mentorList.add(model);
+                    }
+                }
+                filterMentors(etSearch.getText().toString());
             }
-            filterMentors(etSearch.getText().toString());
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(ManageMentorsActivity.this, "Failed to load mentors", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
     private void filterMentors(String query) {
         filteredList.clear();
+        String q = query.toLowerCase();
         for (MentorModel mentor : mentorList) {
-            if (mentor.getName() != null && mentor.getName().toLowerCase().contains(query.toLowerCase())) {
-                filteredList.add(mentor);
-            } else if (mentor.getDomain() != null && mentor.getDomain().toLowerCase().contains(query.toLowerCase())) {
+            boolean matchesName = mentor.getName() != null && mentor.getName().toLowerCase().contains(q);
+            boolean matchesDomain = mentor.getDomain() != null && mentor.getDomain().toLowerCase().contains(q);
+            
+            if (matchesName || matchesDomain) {
                 filteredList.add(mentor);
             }
         }
@@ -96,7 +112,7 @@ public class ManageMentorsActivity extends BaseActivity {
     }
 
     private class MentorAdapter extends RecyclerView.Adapter<MentorAdapter.ViewHolder> {
-        private List<MentorModel> list;
+        private final List<MentorModel> list;
 
         MentorAdapter(List<MentorModel> list) { this.list = list; }
 
@@ -115,14 +131,31 @@ public class ManageMentorsActivity extends BaseActivity {
             List<String> groupIds = mentor.getAssignedGroupIds();
             if (groupIds != null && !groupIds.isEmpty()) {
                 StringBuilder groups = new StringBuilder("Assigned Groups: ");
-                for (String gid : groupIds) groups.append(gid).append(", ");
-                holder.tvGroups.setText(groups.toString().substring(0, groups.length() - 2));
+                for (int i = 0; i < groupIds.size(); i++) {
+                    groups.append(groupIds.get(i));
+                    if (i < groupIds.size() - 1) groups.append(", ");
+                }
+                holder.tvGroups.setText(groups.toString());
             } else {
                 holder.tvGroups.setText("Assigned Groups: None");
             }
 
             holder.btnDelete.setOnClickListener(v -> {
-                db.collection("mentors").document(mentor.getId()).delete().addOnSuccessListener(aVoid -> loadMentors());
+                new MaterialAlertDialogBuilder(ManageMentorsActivity.this)
+                        .setTitle("Remove Mentor")
+                        .setMessage("Are you sure you want to remove " + mentor.getName() + "? This action cannot be undone.")
+                        .setPositiveButton("Remove", (dialog, which) -> {
+                            mDatabase.child("Users").child(mentor.getUid()).removeValue().addOnSuccessListener(aVoid -> {
+                                Toast.makeText(ManageMentorsActivity.this, "Mentor removed", Toast.LENGTH_SHORT).show();
+                            });
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            });
+            
+            holder.btnViewProfile.setOnClickListener(v -> {
+                // Future: Open Profile Detail
+                Toast.makeText(ManageMentorsActivity.this, "Profile: " + mentor.getEmail(), Toast.LENGTH_SHORT).show();
             });
         }
 
@@ -131,13 +164,14 @@ public class ManageMentorsActivity extends BaseActivity {
 
         class ViewHolder extends RecyclerView.ViewHolder {
             TextView tvName, tvDomain, tvGroups;
-            MaterialButton btnDelete;
+            MaterialButton btnDelete, btnViewProfile;
             ViewHolder(View v) {
                 super(v);
                 tvName = v.findViewById(R.id.tvMentorName);
                 tvDomain = v.findViewById(R.id.tvMentorDomain);
                 tvGroups = v.findViewById(R.id.tvAssignedGroups);
-                btnDelete = v.findViewById(R.id.btnDeleteMentor);
+                btnDelete = v.findViewById(R.id.btnDeleteGroup);
+                btnViewProfile = v.findViewById(R.id.btnViewMentorProfile);
             }
         }
     }

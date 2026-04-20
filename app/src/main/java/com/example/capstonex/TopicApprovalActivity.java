@@ -1,8 +1,6 @@
 package com.example.capstonex;
 
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -13,7 +11,6 @@ import androidx.annotation.NonNull;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -84,24 +81,18 @@ public class TopicApprovalActivity extends BaseActivity {
 
     private void setupStepNavigation() {
         btnNext1.setOnClickListener(v -> {
-            if (validateStep(1)) {
-                showStep(2);
-            }
+            if (validateStep(1)) showStep(2);
         });
 
         btnNext2.setOnClickListener(v -> {
-            if (validateStep(2)) {
-                showStep(3);
-            }
+            if (validateStep(2)) showStep(3);
         });
 
         btnBack2.setOnClickListener(v -> showStep(1));
         btnBack3.setOnClickListener(v -> showStep(2));
 
         btnSubmitApproval.setOnClickListener(v -> {
-            if (validateStep(3)) {
-                submitTopics();
-            }
+            if (validateStep(3)) submitTopics();
         });
         
         showStep(1);
@@ -121,15 +112,10 @@ public class TopicApprovalActivity extends BaseActivity {
                 List<String> domainNames = new ArrayList<>();
                 for (DataSnapshot domainSnap : snapshot.getChildren()) {
                     DomainModel domain = domainSnap.getValue(DomainModel.class);
-                    if (domain != null && domain.getName() != null) {
-                        domainNames.add(domain.getName());
-                    }
+                    if (domain != null && domain.getName() != null) domainNames.add(domain.getName());
                 }
                 
-                if (domainNames.isEmpty()) {
-                    // Fallback to resources if DB is empty or use a placeholder
-                    domainNames.add("No Domains Available");
-                }
+                if (domainNames.isEmpty()) domainNames.add("No Domains Available");
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(TopicApprovalActivity.this, 
                         android.R.layout.simple_list_item_1, domainNames);
@@ -138,11 +124,7 @@ public class TopicApprovalActivity extends BaseActivity {
                 actDomain2.setAdapter(adapter);
                 actDomain3.setAdapter(adapter);
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(TopicApprovalActivity.this, "Failed to load domains", Toast.LENGTH_SHORT).show();
-            }
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
@@ -150,32 +132,13 @@ public class TopicApprovalActivity extends BaseActivity {
         TextInputEditText etTitle, etDesc;
         AutoCompleteTextView actDomain;
         
-        if (step == 1) {
-            etTitle = etTitle1;
-            etDesc = etDesc1;
-            actDomain = actDomain1;
-        } else if (step == 2) {
-            etTitle = etTitle2;
-            etDesc = etDesc2;
-            actDomain = actDomain2;
-        } else {
-            etTitle = etTitle3;
-            etDesc = etDesc3;
-            actDomain = actDomain3;
-        }
+        if (step == 1) { etTitle = etTitle1; etDesc = etDesc1; actDomain = actDomain1; }
+        else if (step == 2) { etTitle = etTitle2; etDesc = etDesc2; actDomain = actDomain2; }
+        else { etTitle = etTitle3; etDesc = etDesc3; actDomain = actDomain3; }
 
-        if (etTitle.getText().toString().trim().isEmpty()) {
-            etTitle.setError("Required");
-            return false;
-        }
-        if (actDomain.getText().toString().trim().isEmpty()) {
-            actDomain.setError("Required");
-            return false;
-        }
-        if (etDesc.getText().toString().trim().isEmpty()) {
-            etDesc.setError("Required");
-            return false;
-        }
+        if (etTitle.getText().toString().trim().isEmpty()) { etTitle.setError("Required"); return false; }
+        if (actDomain.getText().toString().trim().isEmpty()) { actDomain.setError("Required"); return false; }
+        if (etDesc.getText().toString().trim().isEmpty()) { etDesc.setError("Required"); return false; }
         return true;
     }
 
@@ -200,33 +163,18 @@ public class TopicApprovalActivity extends BaseActivity {
         btnSubmitApproval.setEnabled(false);
         btnSubmitApproval.setText("Submitting...");
 
-        Map<String, Object> topics = new HashMap<>();
+        Map<String, Object> submittedTopics = new HashMap<>();
         
-        Map<String, String> t1 = new HashMap<>();
-        t1.put("title", etTitle1.getText().toString().trim());
-        t1.put("domain", actDomain1.getText().toString().trim());
-        t1.put("description", etDesc1.getText().toString().trim());
-        t1.put("status", "Pending");
-        
-        Map<String, String> t2 = new HashMap<>();
-        t2.put("title", etTitle2.getText().toString().trim());
-        t2.put("domain", actDomain2.getText().toString().trim());
-        t2.put("description", etDesc2.getText().toString().trim());
-        t2.put("status", "Pending");
+        submittedTopics.put("topic1", createTopicMap(etTitle1, actDomain1, etDesc1));
+        submittedTopics.put("topic2", createTopicMap(etTitle2, actDomain2, etDesc2));
+        submittedTopics.put("topic3", createTopicMap(etTitle3, actDomain3, etDesc3));
 
-        Map<String, String> t3 = new HashMap<>();
-        t3.put("title", etTitle3.getText().toString().trim());
-        t3.put("domain", actDomain3.getText().toString().trim());
-        t3.put("description", etDesc3.getText().toString().trim());
-        t3.put("status", "Pending");
+        Map<String, Object> finalData = new HashMap<>();
+        finalData.put("submittedTopics", submittedTopics);
+        finalData.put("submittedBy", mAuth.getUid());
+        finalData.put("timestamp", System.currentTimeMillis());
 
-        topics.put("topic1", t1);
-        topics.put("topic2", t2);
-        topics.put("topic3", t3);
-        topics.put("submittedBy", mAuth.getUid());
-        topics.put("timestamp", System.currentTimeMillis());
-
-        mDatabase.child("TopicApprovals").child(userGroupId).setValue(topics)
+        mDatabase.child("TopicApprovals").child(userGroupId).setValue(finalData)
                 .addOnSuccessListener(aVoid -> {
                     mDatabase.child("Groups").child(userGroupId).child("status").setValue("Topic Submitted");
                     Toast.makeText(TopicApprovalActivity.this, "Topics submitted successfully!", Toast.LENGTH_LONG).show();
@@ -237,5 +185,14 @@ public class TopicApprovalActivity extends BaseActivity {
                     btnSubmitApproval.setText("SUBMIT ALL");
                     Toast.makeText(TopicApprovalActivity.this, "Failed to submit: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    private Map<String, String> createTopicMap(TextInputEditText title, AutoCompleteTextView domain, TextInputEditText desc) {
+        Map<String, String> map = new HashMap<>();
+        map.put("title", title.getText().toString().trim());
+        map.put("domain", domain.getText().toString().trim());
+        map.put("description", desc.getText().toString().trim());
+        map.put("status", "Pending");
+        return map;
     }
 }

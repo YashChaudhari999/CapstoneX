@@ -16,19 +16,25 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ManageGroupsActivity extends BaseActivity {
 
+    private static final String DB_URL = "https://capstonex-8b885-default-rtdb.firebaseio.com";
     private RecyclerView rvGroups;
     private GroupAdapter adapter;
-    private List<GroupModel> groupList;
-    private List<GroupModel> filteredList;
-    private FirebaseFirestore db;
+    private List<GroupModel> groupList, filteredList;
+    private DatabaseReference mDatabase;
     private EditText etSearch;
 
     @Override
@@ -37,7 +43,7 @@ public class ManageGroupsActivity extends BaseActivity {
         setContentView(R.layout.activity_manage_groups);
         setupEdgeToEdge(findViewById(R.id.manage_groups_root));
 
-        db = FirebaseFirestore.getInstance();
+        mDatabase = FirebaseDatabase.getInstance(DB_URL).getReference();
         rvGroups = findViewById(R.id.rvManageGroups);
         etSearch = findViewById(R.id.etSearchGroups);
         
@@ -55,48 +61,56 @@ public class ManageGroupsActivity extends BaseActivity {
         findViewById(R.id.toolbar).setOnClickListener(v -> finish());
 
         etSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 filterGroups(s.toString());
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
+            @Override public void afterTextChanged(Editable s) {}
         });
 
         loadGroups();
     }
 
     private void loadGroups() {
-        db.collection("groups").get().addOnSuccessListener(queryDocumentSnapshots -> {
-            groupList.clear();
-            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                GroupModel model = doc.toObject(GroupModel.class);
-                model.setId(doc.getId());
-                groupList.add(model);
+        mDatabase.child("Groups").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                groupList.clear();
+                for (DataSnapshot groupSnap : snapshot.getChildren()) {
+                    GroupModel model = groupSnap.getValue(GroupModel.class);
+                    if (model != null) {
+                        groupList.add(model);
+                    }
+                }
+                filterGroups(etSearch.getText().toString());
             }
-            filterGroups(etSearch.getText().toString());
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(ManageGroupsActivity.this, "Failed to load groups", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
     private void filterGroups(String query) {
         filteredList.clear();
+        String q = query.toLowerCase();
         for (GroupModel group : groupList) {
-            boolean matchesId = group.getId() != null && group.getId().toLowerCase().contains(query.toLowerCase());
-            boolean matchesSap = false;
-            if (group.getMembers() != null) {
-                for (String sap : group.getMembers()) {
-                    if (sap.contains(query)) {
-                        matchesSap = true;
+            boolean matchesId = group.getGroupId() != null && group.getGroupId().toLowerCase().contains(q);
+            boolean matchesMember = false;
+            
+            if (group.getMemberDetails() != null) {
+                for (Map<String, String> member : group.getMemberDetails()) {
+                    String sap = member.get("sapId");
+                    String name = member.get("name");
+                    if ((sap != null && sap.contains(q)) || (name != null && name.toLowerCase().contains(q))) {
+                        matchesMember = true;
                         break;
                     }
                 }
             }
             
-            if (matchesId || matchesSap) {
+            if (matchesId || matchesMember) {
                 filteredList.add(group);
             }
         }
@@ -104,7 +118,7 @@ public class ManageGroupsActivity extends BaseActivity {
     }
 
     private class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> {
-        private List<GroupModel> list;
+        private final List<GroupModel> list;
 
         GroupAdapter(List<GroupModel> list) { this.list = list; }
 
@@ -118,21 +132,81 @@ public class ManageGroupsActivity extends BaseActivity {
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             GroupModel group = list.get(position);
             
-            // Set Group ID instead of Name
-            holder.tvId.setText("Group ID: #" + (group.getId() != null ? group.getId() : "N/A"));
+            holder.tvId.setText("Group ID: " + (group.getGroupId() != null ? group.getGroupId() : "N/A"));
             holder.tvStatus.setText(group.getStatus() != null ? group.getStatus().toUpperCase() : "PENDING");
             
-            if (group.getMembers() != null && !group.getMembers().isEmpty()) {
+            if (group.getMemberDetails() != null && !group.getMemberDetails().isEmpty()) {
                 StringBuilder members = new StringBuilder("Members: ");
-                for (String sap : group.getMembers()) members.append(sap).append(", ");
-                String membersStr = members.toString();
-                holder.tvMembers.setText(membersStr.substring(0, membersStr.length() - 2));
+                for (int i = 0; i < group.getMemberDetails().size(); i++) {
+                    members.append(group.getMemberDetails().get(i).get("name"));
+                    if (i < group.getMemberDetails().size() - 1) members.append(", ");
+                }
+                holder.tvMembers.setText(members.toString());
             } else {
                 holder.tvMembers.setText("Members: None");
             }
 
+            // Fetch Mentor Name from UID
+            if (group.getMentorUid() != null && !group.getMentorUid().isEmpty()) {
+                mDatabase.child("Users").child(group.getMentorUid()).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            holder.tvMentor.setText("Mentor: " + snapshot.getValue(String.class));
+                        } else {
+                            holder.tvMentor.setText("Mentor: Not Found");
+                        }
+                    }
+                    @Override public void onCancelled(@NonNull DatabaseError error) {}
+                });
+            } else {
+                holder.tvMentor.setText("Mentor: Not Assigned");
+            }
+
             holder.btnDelete.setOnClickListener(v -> {
-                db.collection("groups").document(group.getId()).delete().addOnSuccessListener(aVoid -> loadGroups());
+                new MaterialAlertDialogBuilder(ManageGroupsActivity.this)
+                        .setTitle("Delete Group")
+                        .setMessage("Are you sure you want to delete group " + group.getGroupId() + "? This action cannot be undone.")
+                        .setPositiveButton("Delete", (dialog, which) -> {
+                            deleteGroupAtomically(group);
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            });
+
+            holder.btnAssign.setOnClickListener(v -> {
+                // Future: Show Mentor Assignment Dialog
+                Toast.makeText(ManageGroupsActivity.this, "Assignment feature coming soon", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        private void deleteGroupAtomically(GroupModel group) {
+            Map<String, Object> updates = new HashMap<>();
+            
+            // 1. Remove the group node
+            updates.put("/Groups/" + group.getGroupId(), null);
+            
+            // 2. Clear user assignments
+            if (group.getMemberUids() != null) {
+                for (String uid : group.getMemberUids()) {
+                    updates.put("/Users/" + uid + "/hasGroup", false);
+                    updates.put("/Users/" + uid + "/groupId", "");
+                }
+            }
+            
+            // 3. Clear mentor assignment if exists
+            if (group.getMentorUid() != null && !group.getMentorUid().isEmpty()) {
+                // Assuming Users/{uid}/assignedGroupIds is a list or similar
+                // For simplicity, we just delete the group node and update members.
+                // If mentors have a list, it would need a more complex update.
+            }
+
+            mDatabase.updateChildren(updates).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(ManageGroupsActivity.this, "Group and member assignments cleared", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(ManageGroupsActivity.this, "Deletion failed", Toast.LENGTH_SHORT).show();
+                }
             });
         }
 
@@ -140,14 +214,16 @@ public class ManageGroupsActivity extends BaseActivity {
         public int getItemCount() { return list.size(); }
 
         class ViewHolder extends RecyclerView.ViewHolder {
-            TextView tvId, tvStatus, tvMembers;
-            MaterialButton btnDelete;
+            TextView tvId, tvStatus, tvMembers, tvMentor;
+            MaterialButton btnDelete, btnAssign;
             ViewHolder(View v) {
                 super(v);
                 tvId = v.findViewById(R.id.tvManageGroupId);
                 tvStatus = v.findViewById(R.id.tvManageGroupStatus);
                 tvMembers = v.findViewById(R.id.tvManageGroupMembers);
+                tvMentor = v.findViewById(R.id.tvManageGroupMentor);
                 btnDelete = v.findViewById(R.id.btnDeleteGroup);
+                btnAssign = v.findViewById(R.id.btnAssignMentor);
             }
         }
     }
