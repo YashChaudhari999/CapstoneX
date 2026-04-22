@@ -39,7 +39,7 @@ public class AdminDashboardActivity extends BaseActivity {
     private MaterialButton btnAddStudents, btnAddMentors;
     private ProgressBar progressStudents, progressMentors;
     private TextView tvStudentImportStatus, tvMentorImportStatus;
-    private TextView tvGroupCount, tvMentorCount;
+    private TextView tvGroupCount, tvMentorCount, tvStudentCount;
 
     private DatabaseReference usersRef;
     private DatabaseReference groupsRef;
@@ -114,12 +114,14 @@ public class AdminDashboardActivity extends BaseActivity {
         tvMentorImportStatus = findViewById(R.id.tvMentorImportStatus);
         tvGroupCount = findViewById(R.id.tvGroupCount);
         tvMentorCount = findViewById(R.id.tvMentorCount);
+        tvStudentCount = findViewById(R.id.tvStudentCount);
 
         btnAddStudents.setOnClickListener(v -> openFilePicker(REQ_PICK_STUDENTS));
         btnAddMentors.setOnClickListener(v -> openFilePicker(REQ_PICK_MENTORS));
 
         // Connect tiles to activities
         findViewById(R.id.cardGroups).setOnClickListener(v -> navigateTo(ManageGroupsActivity.class));
+        findViewById(R.id.cardStudents).setOnClickListener(v -> navigateTo(ManageStudentsActivity.class));
         findViewById(R.id.cardMentors).setOnClickListener(v -> navigateTo(ManageMentorsActivity.class));
         findViewById(R.id.cardAddDomain).setOnClickListener(v -> navigateTo(AddDomainActivity.class));
         findViewById(R.id.cardTopicApproval).setOnClickListener(v -> navigateTo(AdminTopicApprovalActivity.class));
@@ -231,30 +233,33 @@ public class AdminDashboardActivity extends BaseActivity {
     }
 
     private void loadOverviewCounts() {
+        // Mentors Count
         usersRef.orderByChild("role").equalTo("mentor")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         tvMentorCount.setText(snapshot.getChildrenCount() + " Mentors");
                     }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e(TAG, "Mentor count error: " + error.getMessage());
-                    }
+                    @Override public void onCancelled(@NonNull DatabaseError error) {}
                 });
 
+        // Students Count
+        usersRef.orderByChild("role").equalTo("student")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        tvStudentCount.setText(snapshot.getChildrenCount() + " Students");
+                    }
+                    @Override public void onCancelled(@NonNull DatabaseError error) {}
+                });
+
+        // Groups Count
         groupsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 tvGroupCount.setText(snapshot.getChildrenCount() + " Groups");
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "Group count error: " + error.getMessage());
-                tvGroupCount.setText("0 Groups");
-            }
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 

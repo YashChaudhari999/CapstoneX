@@ -60,19 +60,20 @@
                     android:layout_height="wrap_content"
                     android:text="SYSTEM OVERVIEW" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <GridLayout
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    android:paddingBottom="15dp">
+                    android:layout_height="wrap_content"
+                    android:columnCount="2"
+                    android:useDefaultMargins="false"
+                    android:alignmentMode="alignMargins">
 
+                    <!-- Groups Card -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardGroups"
                         style="@style/Widget.Capstone.CardView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        app:layout_constraintEnd_toStartOf="@+id/cardMentors"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:layout_columnWeight="1">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -106,14 +107,53 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- Students Card (NEW) -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardStudents"
+                        style="@style/Widget.Capstone.CardView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                app:cardBackgroundColor="@color/colorAccentGreen"
+                                app:cardCornerRadius="24dp"
+                                app:cardElevation="0dp">
+
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_person"
+                                    app:tint="#FFFFFF" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <TextView
+                                android:id="@+id/tvStudentCount"
+                                style="@style/Capstone.Text.Body"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="— Students" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Mentors Card -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardMentors"
                         style="@style/Widget.Capstone.CardView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/cardGroups"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:layout_columnWeight="1">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -147,15 +187,13 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- Topic Approval Card -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardTopicApproval"
                         style="@style/Widget.Capstone.CardView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        app:layout_constraintEnd_toStartOf="@+id/cardAddDomain"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/cardGroups">
+                        android:layout_columnWeight="1">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -189,15 +227,13 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- Add Domain Card -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardAddDomain"
                         style="@style/Widget.Capstone.CardView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/cardTopicApproval"
-                        app:layout_constraintTop_toBottomOf="@id/cardMentors">
+                        android:layout_columnWeight="1">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -230,7 +266,7 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                </GridLayout>
 
                 <!-- ── User Management Section ───────────────────────── -->
                 <TextView

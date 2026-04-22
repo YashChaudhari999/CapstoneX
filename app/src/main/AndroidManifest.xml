@@ -65,6 +65,7 @@
         <activity android:name=".AssignMentorActivity" />
         <activity android:name=".MentorGroupsActivity" />
         <activity android:name=".AdminTopicApprovalActivity" />
+        <activity android:name=".ManageStudentsActivity" />
 
     </application>
 

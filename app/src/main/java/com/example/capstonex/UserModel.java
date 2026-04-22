@@ -7,6 +7,10 @@ public class UserModel {
     private String role;
     private String domain; // Specific for mentors
     private String groupId; // Specific for students
+    private String sapId;   
+    private String rollNo;  
+    private String branch;  // Added branch field
+    private String profileImageUrl; 
     private boolean hasGroup;
 
     public UserModel() {}
@@ -23,6 +27,14 @@ public class UserModel {
     public void setDomain(String domain) { this.domain = domain; }
     public String getGroupId() { return groupId; }
     public void setGroupId(String groupId) { this.groupId = groupId; }
+    public String getSapId() { return sapId; }
+    public void setSapId(String sapId) { this.sapId = sapId; }
+    public String getRollNo() { return rollNo; }
+    public void setRollNo(String rollNo) { this.rollNo = rollNo; }
+    public String getBranch() { return branch; }
+    public void setBranch(String branch) { this.branch = branch; }
+    public String getProfileImageUrl() { return profileImageUrl; }
+    public void setProfileImageUrl(String profileImageUrl) { this.profileImageUrl = profileImageUrl; }
     public boolean isHasGroup() { return hasGroup; }
     public void setHasGroup(boolean hasGroup) { this.hasGroup = hasGroup; }
 }
