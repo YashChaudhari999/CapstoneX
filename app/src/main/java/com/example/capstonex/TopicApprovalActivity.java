@@ -49,6 +49,10 @@ public class TopicApprovalActivity extends BaseActivity {
         initViews();
         setupStepNavigation();
         setupDomainDropdowns();
+
+        // ── BUG-009 FIX: Disable submit until groupId is confirmed async ──────
+        btnSubmitApproval.setEnabled(false);
+        btnSubmitApproval.setAlpha(0.5f);
         fetchUserGroupId();
 
         findViewById(R.id.toolbar).setOnClickListener(v -> finish());
@@ -144,14 +148,42 @@ public class TopicApprovalActivity extends BaseActivity {
 
     private void fetchUserGroupId() {
         String uid = mAuth.getUid();
-        if (uid == null) return;
+        if (uid == null) {
+            showGroupError();
+            return;
+        }
         mDatabase.child("Users").child(uid).child("groupId").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) userGroupId = snapshot.getValue(String.class);
+                if (snapshot.exists()) {
+                    String gid = snapshot.getValue(String.class);
+                    if (gid != null && !gid.isEmpty()) {
+                        userGroupId = gid;
+                        // ── BUG-009 FIX: enable submit now that groupId is confirmed ──
+                        btnSubmitApproval.setEnabled(true);
+                        btnSubmitApproval.setAlpha(1.0f);
+                        return;
+                    }
+                }
+                showGroupError();
             }
-            @Override public void onCancelled(@NonNull DatabaseError error) {}
+            // ── BUG-009 FIX: was completely silent ──
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(TopicApprovalActivity.this,
+                        "Network error — could not verify group. Check your connection.",
+                        Toast.LENGTH_LONG).show();
+            }
         });
+    }
+
+    /** Shows error and keeps Submit disabled if group not found. */
+    private void showGroupError() {
+        btnSubmitApproval.setEnabled(false);
+        btnSubmitApproval.setAlpha(0.5f);
+        Toast.makeText(this,
+                "You are not in a group. Contact your admin.",
+                Toast.LENGTH_LONG).show();
     }
 
     private void submitTopics() {

@@ -28,7 +28,7 @@ import android.view.MenuItem;
 public class MentorDashboardActivity extends BaseActivity {
 
     private static final String DB_URL =
-            "https://capstonex-8b885-default-rtdb.firebaseio.com";
+            AppConstants.REALTIME_DB_URL;
 
     private DrawerLayout drawerLayout;
     private TextView tvMentorName;
@@ -38,6 +38,9 @@ public class MentorDashboardActivity extends BaseActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference userRef;
     private DatabaseReference groupsRef;
+
+    // ── BUG-007 FIX: store listener so it can be removed in onDestroy() ──────
+    private ValueEventListener groupsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +112,8 @@ public class MentorDashboardActivity extends BaseActivity {
         rvGroups = findViewById(R.id.rvGroups);
         rvGroups.setLayoutManager(new LinearLayoutManager(this));
 
-        ivProfileCard = findProfileImageView();
+        // ── BUG-005 FIX: use direct findViewById instead of fragile view traversal ──
+        ivProfileCard = findViewById(R.id.ivMentorProfileCard);
 
         findViewById(R.id.ivNotifications).setOnClickListener(v -> {
             Intent intent = new Intent(this, NotificationsActivity.class);
@@ -186,38 +190,37 @@ public class MentorDashboardActivity extends BaseActivity {
     }
 
     private void loadAssignedGroups(String uid) {
-        groupsRef.orderByChild("mentorUid").equalTo(uid)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        java.util.List<String> groupNames = new java.util.ArrayList<>();
-                        for (DataSnapshot group : snapshot.getChildren()) {
-                            String groupName = group.child("name").getValue(String.class);
-                            if (groupName != null) groupNames.add(groupName);
-                        }
-                        rvGroups.setAdapter(new SimpleStringAdapter(groupNames));
-                    }
+        // ── BUG-007 FIX: store listener reference for removal in onDestroy() ──
+        groupsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                java.util.List<String> groupNames = new java.util.ArrayList<>();
+                for (DataSnapshot group : snapshot.getChildren()) {
+                    String groupName = group.child("groupId").getValue(String.class);
+                    if (groupName != null) groupNames.add(groupName);
+                }
+                rvGroups.setAdapter(new SimpleStringAdapter(groupNames));
+            }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
-                });
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        };
+        groupsRef.orderByChild("mentorUid").equalTo(uid).addValueEventListener(groupsListener);
     }
 
-    private ImageView findProfileImageView() {
-        try {
-            android.view.ViewGroup contentCard =
-                    (android.view.ViewGroup) ((android.view.ViewGroup)
-                            rvGroups.getParent()).getChildAt(0);
-            android.view.ViewGroup outerLayout =
-                    (android.view.ViewGroup) contentCard.getChildAt(0);
-            android.view.ViewGroup avatarCard =
-                    (android.view.ViewGroup) outerLayout.getChildAt(0);
-            return (ImageView) avatarCard.getChildAt(0);
-        } catch (Exception e) {
-            return null;
+    // ── BUG-007 FIX: remove all permanent listeners to prevent memory leaks ──
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (groupsListener != null && groupsRef != null) {
+            groupsRef.removeEventListener(groupsListener);
         }
     }
+
+    // ── BUG-005 FIX: old fragile view-traversal method removed ───────────────
+    // findProfileImageView() was navigating getChildAt(0) chains that broke
+    // whenever the layout changed. Now uses direct findViewById(R.id.ivMentorProfileCard).
 
     private static class SimpleStringAdapter
             extends RecyclerView.Adapter<SimpleStringAdapter.VH> {

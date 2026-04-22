@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -16,7 +17,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -29,7 +32,7 @@ import java.util.Set;
 
 public class GroupCreationActivity extends BaseActivity {
 
-    private static final String DB_URL = "https://capstonex-8b885-default-rtdb.firebaseio.com";
+    // BUG-003 / BUG-004 fixes applied — see generateIdAndExecute() and fetchUserDetails()
 
     private TextInputEditText etLeaderSap, etLeaderName, etLeaderRoll;
     private TextInputEditText etMember2Sap, etMember2Name, etMember2Roll;
@@ -52,7 +55,7 @@ public class GroupCreationActivity extends BaseActivity {
         setContentView(R.layout.activity_group_creation);
         setupEdgeToEdge(findViewById(R.id.group_creation_root));
 
-        mDatabase = FirebaseDatabase.getInstance(DB_URL).getReference();
+        mDatabase = FirebaseDatabase.getInstance(AppConstants.REALTIME_DB_URL).getReference();
         mAuth = FirebaseAuth.getInstance();
 
         progressDialog = new ProgressDialog(this);
@@ -127,8 +130,13 @@ public class GroupCreationActivity extends BaseActivity {
                         }
                     }
 
+                    // ── BUG-004 FIX: show inline error instead of silent fail ──
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {}
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        nameEt.setText("");
+                        rollEt.setText("");
+                        nameEt.setError("Network error — try again");
+                    }
                 });
     }
 
@@ -165,35 +173,51 @@ public class GroupCreationActivity extends BaseActivity {
         generateIdAndExecute(branch.toUpperCase(), year, membersToProcess);
     }
 
+    /**
+     * BUG-003 FIX: Replaced the racy read-max+1 pattern with a Firebase Transaction.
+     * Previously two concurrent calls could read the same maxNum and both write the
+     * same group ID, silently overwriting each other's data.
+     * A Transaction is atomic on the server — the counter is guaranteed to increment
+     * sequentially even under concurrent writes.
+     */
     private void generateIdAndExecute(String branch, int year, List<DataSnapshot> memberDocs) {
         progressDialog.setMessage("Allocating Group ID...");
-        progressDialog.show();
+        if (!progressDialog.isShowing()) progressDialog.show();
 
-        String prefix = branch + year + "_";
-        mDatabase.child("Groups").orderByKey().startAt(prefix).endAt(prefix + "\uf8ff")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        int maxNum = 0;
-                        for (DataSnapshot group : snapshot.getChildren()) {
-                            String key = group.getKey();
-                            if (key != null && key.startsWith(prefix)) {
-                                try {
-                                    String numPart = key.substring(prefix.length());
-                                    int num = Integer.parseInt(numPart);
-                                    if (num > maxNum) maxNum = num;
-                                } catch (Exception ignored) {}
-                            }
-                        }
-                        String newId = prefix + (maxNum + 1);
-                        executeCreation(newId, memberDocs);
-                    }
+        // Counter node: Counters/{BRANCH}{YEAR}  e.g. Counters/IT2026
+        DatabaseReference counterRef = mDatabase.child("Counters").child(branch + year);
+        final String prefix = branch + year + "_";
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        progressDialog.dismiss();
-                    }
-                });
+        counterRef.runTransaction(new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                Integer current = currentData.getValue(Integer.class);
+                currentData.setValue(current == null ? 1 : current + 1);
+                return Transaction.success(currentData);
+            }
+
+            @Override
+            public void onComplete(@Nullable DatabaseError error, boolean committed,
+                                   @Nullable DataSnapshot currentData) {
+                if (!committed || error != null || currentData == null) {
+                    progressDialog.dismiss();
+                    Toast.makeText(GroupCreationActivity.this,
+                            "Failed to allocate Group ID. Please try again.",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Integer count = currentData.getValue(Integer.class);
+                if (count == null) {
+                    progressDialog.dismiss();
+                    Toast.makeText(GroupCreationActivity.this,
+                            "Counter error. Please try again.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String newGroupId = prefix + count;
+                executeCreation(newGroupId, memberDocs);
+            }
+        });
     }
 
     private void executeCreation(String groupId, List<DataSnapshot> memberDocs) {

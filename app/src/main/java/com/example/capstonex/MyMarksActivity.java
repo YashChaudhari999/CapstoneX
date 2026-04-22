@@ -23,7 +23,8 @@ public class MyMarksActivity extends BaseActivity {
         toolbar.setNavigationOnClickListener(v -> finish());
         // 1. Bottom Navigation Setup
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
-        bottomNavigation.setSelectedItemId(R.id.nav_home);
+        // BUG-MARKS-01 FIX: was nav_home — Reviews tab was never highlighted on this screen
+        bottomNavigation.setSelectedItemId(R.id.nav_reviews);
 
         bottomNavigation.setOnItemSelectedListener(item -> {
             int id = item.getItemId();

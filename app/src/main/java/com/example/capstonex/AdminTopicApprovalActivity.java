@@ -29,7 +29,7 @@ import java.util.Map;
 public class AdminTopicApprovalActivity extends BaseActivity {
 
     private static final String DB_URL =
-            "https://capstonex-8b885-default-rtdb.firebaseio.com";
+            AppConstants.REALTIME_DB_URL;
     /**
      * MASTER list — populated once from Firebase "Groups", NEVER modified by
      * any filter / search operation.  All filtering creates a new sub-list from
@@ -56,6 +56,10 @@ public class AdminTopicApprovalActivity extends BaseActivity {
     // ── Data ──────────────────────────────────────────────────────────────────
     private DatabaseReference mDatabase;
     private GroupTopicAdapter adapter;
+
+    // ── BUG-007 FIX: store listener refs for removal in onDestroy() ─────────
+    private ValueEventListener groupsListener;
+    private ValueEventListener topicApprovalsListener;
 
     // ── Filter state ──────────────────────────────────────────────────────────
     /**
@@ -158,7 +162,8 @@ public class AdminTopicApprovalActivity extends BaseActivity {
      */
     private void listenToGroups() {
         showLoading(true);
-        mDatabase.child("Groups").addValueEventListener(new ValueEventListener() {
+        // ── BUG-007 FIX: store listener so we can remove it in onDestroy() ──
+        groupsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 masterList.clear();
@@ -173,7 +178,8 @@ public class AdminTopicApprovalActivity extends BaseActivity {
             public void onCancelled(@NonNull DatabaseError error) {
                 showLoading(false);
             }
-        });
+        };
+        mDatabase.child("Groups").addValueEventListener(groupsListener);
     }
 
     /**
@@ -187,7 +193,8 @@ public class AdminTopicApprovalActivity extends BaseActivity {
      * • "notopics"  → no topics submitted at all
      */
     private void listenToTopicApprovals() {
-        mDatabase.child("TopicApprovals").addValueEventListener(new ValueEventListener() {
+        // ── BUG-007 FIX: store listener so we can remove it in onDestroy() ──
+        topicApprovalsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 topicStatusCache.clear();
@@ -209,7 +216,18 @@ public class AdminTopicApprovalActivity extends BaseActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
-        });
+        };
+        mDatabase.child("TopicApprovals").addValueEventListener(topicApprovalsListener);
+    }
+
+    // ── BUG-007 FIX: remove permanent listeners to prevent memory leaks ────
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (groupsListener != null)
+            mDatabase.child("Groups").removeEventListener(groupsListener);
+        if (topicApprovalsListener != null)
+            mDatabase.child("TopicApprovals").removeEventListener(topicApprovalsListener);
     }
 
     // ── Core filter + stats logic ─────────────────────────────────────────────

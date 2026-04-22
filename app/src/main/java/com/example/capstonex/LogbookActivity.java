@@ -7,13 +7,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+// BUG-LOG-01 FIX: removed unused AppCompatActivity import — now extends BaseActivity
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,23 +24,29 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LogbookActivity extends AppCompatActivity {
+// BUG-LOG-01 FIX: was AppCompatActivity — changed to BaseActivity for consistent status bar + edge-to-edge
+public class LogbookActivity extends BaseActivity {
 
     private static final String DB_URL = "https://capstonex-8b885-default-rtdb.firebaseio.com";
-    
+
     private RecyclerView rvLogEntries;
     private LogbookAdapter adapter;
     private List<LogEntryModel> logList;
     private TextView tvTotalEntries, tvSignedEntries, tvPendingEntries;
-    
+
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
     private String userGroupId = "";
+
+    // BUG-LOG-02 FIX: store permanent listener reference for cleanup in onDestroy()
+    private ValueEventListener logbookListener;
+    private DatabaseReference logbookRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logbook);
+        setupEdgeToEdge(findViewById(android.R.id.content)); // BUG-LOG-01 FIX
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance(DB_URL).getReference();
@@ -90,12 +96,14 @@ public class LogbookActivity extends AppCompatActivity {
     }
 
     private void loadLogEntries() {
-        mDatabase.child("Logbook").child(userGroupId).addValueEventListener(new ValueEventListener() {
+        // BUG-LOG-02 FIX: store listener reference so it can be removed in onDestroy()
+        logbookRef = mDatabase.child("Logbook").child(userGroupId);
+        logbookListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 logList.clear();
                 int total = 0, signed = 0, pending = 0;
-                
+
                 for (DataSnapshot logSnap : snapshot.getChildren()) {
                     LogEntryModel entry = logSnap.getValue(LogEntryModel.class);
                     if (entry != null) {
@@ -105,7 +113,7 @@ public class LogbookActivity extends AppCompatActivity {
                         else pending++;
                     }
                 }
-                
+
                 adapter.notifyDataSetChanged();
                 updateStats(total, signed, pending);
             }
@@ -114,7 +122,17 @@ public class LogbookActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(LogbookActivity.this, "Failed to load logs", Toast.LENGTH_SHORT).show();
             }
-        });
+        };
+        logbookRef.addValueEventListener(logbookListener);
+    }
+
+    // BUG-LOG-02 FIX: remove permanent listener on destroy to prevent memory leak
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (logbookListener != null && logbookRef != null) {
+            logbookRef.removeEventListener(logbookListener);
+        }
     }
 
     private void updateStats(int total, int signed, int pending) {
