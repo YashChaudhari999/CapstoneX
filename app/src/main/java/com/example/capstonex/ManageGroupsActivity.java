@@ -30,12 +30,15 @@ import java.util.Map;
 
 public class ManageGroupsActivity extends BaseActivity {
 
-    private static final String DB_URL = "https://capstonex-8b885-default-rtdb.firebaseio.com";
+    private static final String DB_URL = AppConstants.REALTIME_DB_URL;
     private RecyclerView rvGroups;
     private GroupAdapter adapter;
     private List<GroupModel> groupList, filteredList;
     private DatabaseReference mDatabase;
     private EditText etSearch;
+
+    // ── BUG-007 FIX: store listener reference for removal in onDestroy() ─────
+    private ValueEventListener groupsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +75,8 @@ public class ManageGroupsActivity extends BaseActivity {
     }
 
     private void loadGroups() {
-        mDatabase.child("Groups").addValueEventListener(new ValueEventListener() {
+        // ── BUG-007 FIX: store listener so we can remove it in onDestroy() ──
+        groupsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 groupList.clear();
@@ -89,7 +93,17 @@ public class ManageGroupsActivity extends BaseActivity {
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(ManageGroupsActivity.this, "Failed to load groups", Toast.LENGTH_SHORT).show();
             }
-        });
+        };
+        mDatabase.child("Groups").addValueEventListener(groupsListener);
+    }
+
+    // ── BUG-007 FIX: remove permanent listener on destroy ─────────────────
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (groupsListener != null) {
+            mDatabase.child("Groups").removeEventListener(groupsListener);
+        }
     }
 
     private void filterGroups(String query) {
@@ -120,6 +134,9 @@ public class ManageGroupsActivity extends BaseActivity {
     private class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> {
         private final List<GroupModel> list;
 
+        // ── BUG-006 FIX: mentor name cache avoids a Firebase call on every scroll ──
+        private final Map<String, String> mentorNameCache = new HashMap<>();
+
         GroupAdapter(List<GroupModel> list) { this.list = list; }
 
         @NonNull
@@ -146,21 +163,30 @@ public class ManageGroupsActivity extends BaseActivity {
                 holder.tvMembers.setText("Members: None");
             }
 
-            // Fetch Mentor Name from UID
-            if (group.getMentorUid() != null && !group.getMentorUid().isEmpty()) {
-                mDatabase.child("Users").child(group.getMentorUid()).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            holder.tvMentor.setText("Mentor: " + snapshot.getValue(String.class));
-                        } else {
-                            holder.tvMentor.setText("Mentor: Not Found");
-                        }
-                    }
-                    @Override public void onCancelled(@NonNull DatabaseError error) {}
-                });
-            } else {
+            // ── BUG-006 FIX: use cache; only fire a Firebase read on first encounter ──
+            String mentorUid = group.getMentorUid();
+            if (mentorUid == null || mentorUid.isEmpty()) {
                 holder.tvMentor.setText("Mentor: Not Assigned");
+            } else if (mentorNameCache.containsKey(mentorUid)) {
+                holder.tvMentor.setText("Mentor: " + mentorNameCache.get(mentorUid));
+            } else {
+                holder.tvMentor.setText("Mentor: Loading...");
+                mDatabase.child("Users").child(mentorUid).child("name")
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                String name = snapshot.exists()
+                                        ? snapshot.getValue(String.class) : "Not Found";
+                                if (name == null) name = "Not Found";
+                                mentorNameCache.put(mentorUid, name);
+                                // Update this specific row only, not the whole list
+                                holder.tvMentor.setText("Mentor: " + name);
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                holder.tvMentor.setText("Mentor: Error");
+                            }
+                        });
             }
 
             holder.btnDelete.setOnClickListener(v -> {

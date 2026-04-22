@@ -276,7 +276,16 @@ public class ProfileActivity extends BaseActivity {
 
                     @Override
                     public void onSuccess(String id, Map resultData) {
-                        String newUrl = resultData.get("secure_url").toString();
+                        // ── BUG-011 FIX: null-check secure_url before calling toString() ──
+                        Object urlObj = resultData.get("secure_url");
+                        if (urlObj == null) {
+                            setBusy(false);
+                            Toast.makeText(ProfileActivity.this,
+                                    "Upload succeeded but URL was missing. Please try again.",
+                                    Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        String newUrl = urlObj.toString();
 
                         userRef.child("profileImageUrl").setValue(newUrl)
                                 .addOnSuccessListener(v -> {

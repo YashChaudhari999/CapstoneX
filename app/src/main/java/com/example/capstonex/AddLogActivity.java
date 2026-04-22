@@ -39,7 +39,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AddLogActivity extends AppCompatActivity {
+// BUG-008 FIX: extended BaseActivity (was AppCompatActivity) so this screen
+// receives the same custom status bar colour and edge-to-edge setup.
+public class AddLogActivity extends BaseActivity {
 
     private static final String UPLOAD_PRESET = "Massanger";
     private static final String DB_URL = "https://capstonex-8b885-default-rtdb.firebaseio.com";

@@ -63,6 +63,18 @@ public class LoginActivity extends BaseActivity {
         etEmail.addTextChangedListener(new SimpleTextWatcher(() -> tilEmail.setError(null)));
         etPassword.addTextChangedListener(new SimpleTextWatcher(() -> tilPassword.setError(null)));
 
+        // OBS-03 FIX: clear credentials and errors when the user switches role
+        // Prevents accidental cross-role credential submission
+        toggleRole.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                etEmail.setText("");
+                etPassword.setText("");
+                tilEmail.setError(null);
+                tilPassword.setError(null);
+                setLoadingState(false); // reset any stuck loading state
+            }
+        });
+
         findViewById(R.id.tvForgotPassword).setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
             if (TextUtils.isEmpty(email)) {
