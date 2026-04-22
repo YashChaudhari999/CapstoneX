@@ -29,6 +29,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_plus"
             android:rotation="45"
+            android:visibility="visible"
             app:tint="@color/colorDashboardRed" />
 
     </LinearLayout>

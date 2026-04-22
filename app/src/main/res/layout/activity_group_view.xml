@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/group_view_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorMainBg">
+    android:background="@color/colorOuterBg">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -15,18 +16,27 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="95dp"
             android:minHeight="?attr/actionBarSize"
             android:paddingTop="35dp"
+            android:layout_marginBottom="1dp"
             app:navigationIcon="@drawable/ic_back"
-            app:title="My Group"
-            app:titleTextColor="#FFFFFF" />
+            app:navigationIconTint="#FFFFFF">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="My Group"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/colorMainBg"
         android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -36,148 +46,179 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Loading indicator -->
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="32dp"
-                android:visibility="visible" />
-
-            <!-- Error message -->
-            <TextView
-                android:id="@+id/tvError"
+            <!-- Mentor Assignment Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardMentorInfo"
+                style="@style/Widget.Capstone.CardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:gravity="center"
-                android:textColor="#FF5252"
-                android:textSize="14sp"
-                android:visibility="gone" />
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_card_with_border"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ASSIGNED MENTOR"
+                        style="@style/Capstone.Text.CardLabel"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            app:cardCornerRadius="25dp"
+                            app:cardElevation="0dp">
+                            <ImageView
+                                android:id="@+id/ivMentorAvatar"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:src="@drawable/ic_person"
+                                android:scaleType="centerCrop" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvDetailMentorName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Loading Mentor..."
+                                style="@style/Capstone.Text.SectionHeader" />
+
+                            <TextView
+                                android:id="@+id/tvDetailMentorDomain"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Expertise: [Loading...]"
+                                style="@style/Capstone.Text.Muted" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Group Info Card -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.Capstone.CardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_card_with_border"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
-                        style="@style/Capstone.Text.SectionHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="GROUP INFO" />
+                        android:text="GROUP INFO"
+                        style="@style/Capstone.Text.CardLabel"
+                        android:textStyle="bold" />
 
-                    <LinearLayout
+                    <TableLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:orientation="horizontal">
+                        android:layout_marginTop="12dp">
 
-                        <TextView
-                            style="@style/Capstone.Text.Muted"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Group ID" />
+                        <TableRow android:layout_marginBottom="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Group ID"
+                                style="@style/Capstone.Text.Muted"
+                                android:layout_marginEnd="24dp"/>
+                            <TextView
+                                android:id="@+id/tvGroupId"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Loading..."
+                                style="@style/Capstone.Text.Body"
+                                android:textStyle="bold" />
+                        </TableRow>
 
-                        <TextView
-                            android:id="@+id/tvGroupId"
-                            style="@style/Capstone.Text.Body"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="2"
-                            android:text="—" />
-                    </LinearLayout>
+                        <TableRow android:layout_marginBottom="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Status"
+                                style="@style/Capstone.Text.Muted"
+                                android:layout_marginEnd="24dp"/>
+                            <TextView
+                                android:id="@+id/tvGroupStatus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Loading..."
+                                style="@style/Capstone.Text.Body"
+                                android:textStyle="bold" />
+                        </TableRow>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            style="@style/Capstone.Text.Muted"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Status" />
-
-                        <TextView
-                            android:id="@+id/tvGroupStatus"
-                            style="@style/Capstone.Text.Body"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="2"
-                            android:text="—" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            style="@style/Capstone.Text.Muted"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Leader" />
-
-                        <TextView
-                            android:id="@+id/tvLeaderName"
-                            style="@style/Capstone.Text.Body"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="2"
-                            android:text="—" />
-                    </LinearLayout>
-
+                        <TableRow>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Leader"
+                                style="@style/Capstone.Text.Muted"
+                                android:layout_marginEnd="24dp"/>
+                            <TextView
+                                android:id="@+id/tvLeaderName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Loading..."
+                                style="@style/Capstone.Text.Body"
+                                android:textStyle="bold" />
+                        </TableRow>
+                    </TableLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Members Card -->
-            <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.Capstone.CardView"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="MEMBERS"
+                style="@style/Capstone.Text.SectionHeader" />
+
+            <LinearLayout
+                android:id="@+id/llMembersContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_card_with_border"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="32dp"
+                android:visibility="gone" />
 
-                    <TextView
-                        style="@style/Capstone.Text.SectionHeader"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="MEMBERS" />
-
-                    <!-- Member rows injected here by Java -->
-                    <LinearLayout
-                        android:id="@+id/llMembersContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:orientation="vertical" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <View
+            <TextView
+                android:id="@+id/tvError"
                 android:layout_width="match_parent"
-                android:layout_height="32dp" />
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/colorAccentRed"
+                android:visibility="gone" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

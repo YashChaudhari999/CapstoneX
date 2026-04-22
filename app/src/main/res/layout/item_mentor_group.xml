@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/Widget.Capstone.CardView">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_card_with_border"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvMentorGroupId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Group ID: #12345"
+            style="@style/Capstone.Text.SectionHeader" />
+
+        <TextView
+            android:id="@+id/tvMentorGroupMembers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Members: Student Name 1, Student Name 2"
+            style="@style/Capstone.Text.Body" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnViewLogbook"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="VIEW LOGBOOK"
+            android:textColor="@color/colorLearningNavy"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

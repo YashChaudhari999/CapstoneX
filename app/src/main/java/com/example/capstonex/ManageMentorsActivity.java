@@ -154,7 +154,6 @@ public class ManageMentorsActivity extends BaseActivity {
             });
             
             holder.btnViewProfile.setOnClickListener(v -> {
-                // Future: Open Profile Detail
                 Toast.makeText(ManageMentorsActivity.this, "Profile: " + mentor.getEmail(), Toast.LENGTH_SHORT).show();
             });
         }
@@ -170,7 +169,7 @@ public class ManageMentorsActivity extends BaseActivity {
                 tvName = v.findViewById(R.id.tvMentorName);
                 tvDomain = v.findViewById(R.id.tvMentorDomain);
                 tvGroups = v.findViewById(R.id.tvAssignedGroups);
-                btnDelete = v.findViewById(R.id.btnDeleteGroup);
+                btnDelete = v.findViewById(R.id.btnDeleteMentor);
                 btnViewProfile = v.findViewById(R.id.btnViewMentorProfile);
             }
         }

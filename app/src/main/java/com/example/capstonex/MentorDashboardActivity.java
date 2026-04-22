@@ -76,8 +76,8 @@ public class MentorDashboardActivity extends BaseActivity {
                     Intent intent = new Intent(MentorDashboardActivity.this, ProfileActivity.class);
                     startActivity(intent);
                     overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                } else if (id == R.id.nav_approvals) {
-                    Intent intent = new Intent(MentorDashboardActivity.this, TopicApprovalActivity.class);
+                } else if (id == R.id.nav_my_groups) {
+                    Intent intent = new Intent(MentorDashboardActivity.this, MentorGroupsActivity.class);
                     startActivity(intent);
                     overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 } else if (id == R.id.nav_logout) {

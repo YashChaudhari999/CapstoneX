@@ -175,32 +175,22 @@ public class ManageGroupsActivity extends BaseActivity {
             });
 
             holder.btnAssign.setOnClickListener(v -> {
-                // Future: Show Mentor Assignment Dialog
-                Toast.makeText(ManageGroupsActivity.this, "Assignment feature coming soon", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(ManageGroupsActivity.this, AssignMentorActivity.class);
+                intent.putExtra("groupId", group.getGroupId());
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             });
         }
 
         private void deleteGroupAtomically(GroupModel group) {
             Map<String, Object> updates = new HashMap<>();
-            
-            // 1. Remove the group node
             updates.put("/Groups/" + group.getGroupId(), null);
-            
-            // 2. Clear user assignments
             if (group.getMemberUids() != null) {
                 for (String uid : group.getMemberUids()) {
                     updates.put("/Users/" + uid + "/hasGroup", false);
                     updates.put("/Users/" + uid + "/groupId", "");
                 }
             }
-            
-            // 3. Clear mentor assignment if exists
-            if (group.getMentorUid() != null && !group.getMentorUid().isEmpty()) {
-                // Assuming Users/{uid}/assignedGroupIds is a list or similar
-                // For simplicity, we just delete the group node and update members.
-                // If mentors have a list, it would need a more complex update.
-            }
-
             mDatabase.updateChildren(updates).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     Toast.makeText(ManageGroupsActivity.this, "Group and member assignments cleared", Toast.LENGTH_SHORT).show();
