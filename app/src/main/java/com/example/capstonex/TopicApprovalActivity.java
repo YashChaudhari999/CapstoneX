@@ -49,10 +49,6 @@ public class TopicApprovalActivity extends BaseActivity {
         initViews();
         setupStepNavigation();
         setupDomainDropdowns();
-
-        // ── BUG-009 FIX: Disable submit until groupId is confirmed async ──────
-        btnSubmitApproval.setEnabled(false);
-        btnSubmitApproval.setAlpha(0.5f);
         fetchUserGroupId();
 
         findViewById(R.id.toolbar).setOnClickListener(v -> finish());
@@ -148,42 +144,65 @@ public class TopicApprovalActivity extends BaseActivity {
 
     private void fetchUserGroupId() {
         String uid = mAuth.getUid();
-        if (uid == null) {
-            showGroupError();
-            return;
-        }
+        if (uid == null) return;
         mDatabase.child("Users").child(uid).child("groupId").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    String gid = snapshot.getValue(String.class);
-                    if (gid != null && !gid.isEmpty()) {
-                        userGroupId = gid;
-                        // ── BUG-009 FIX: enable submit now that groupId is confirmed ──
-                        btnSubmitApproval.setEnabled(true);
-                        btnSubmitApproval.setAlpha(1.0f);
-                        return;
+                    userGroupId = snapshot.getValue(String.class);
+                    if (userGroupId != null && !userGroupId.isEmpty()) {
+                        loadSubmittedTopics();
                     }
                 }
-                showGroupError();
             }
-            // ── BUG-009 FIX: was completely silent ──
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(TopicApprovalActivity.this,
-                        "Network error — could not verify group. Check your connection.",
-                        Toast.LENGTH_LONG).show();
-            }
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
-    /** Shows error and keeps Submit disabled if group not found. */
-    private void showGroupError() {
-        btnSubmitApproval.setEnabled(false);
-        btnSubmitApproval.setAlpha(0.5f);
-        Toast.makeText(this,
-                "You are not in a group. Contact your admin.",
-                Toast.LENGTH_LONG).show();
+    private void loadSubmittedTopics() {
+        mDatabase.child("TopicApprovals").child(userGroupId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) return;
+
+                DataSnapshot topics = snapshot.child("submittedTopics");
+                DataSnapshot approved = snapshot.child("approvedTopic");
+                String approvedId = approved.exists() ? approved.child("topicId").getValue(String.class) : "";
+
+                populateStep(topics.child("topic1"), etTitle1, actDomain1, etDesc1, "topic1".equals(approvedId));
+                populateStep(topics.child("topic2"), etTitle2, actDomain2, etDesc2, "topic2".equals(approvedId));
+                populateStep(topics.child("topic3"), etTitle3, actDomain3, etDesc3, "topic3".equals(approvedId));
+
+                if (approved.exists()) {
+                    btnSubmitApproval.setVisibility(View.GONE);
+                    disableAllInputs();
+                    Toast.makeText(TopicApprovalActivity.this, "A topic has been approved. You can no longer edit.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    private void populateStep(DataSnapshot topic, TextInputEditText title, AutoCompleteTextView domain, TextInputEditText desc, boolean isApproved) {
+        if (!topic.exists()) return;
+        title.setText(topic.child("title").getValue(String.class));
+        domain.setText(topic.child("domain").getValue(String.class));
+        desc.setText(topic.child("description").getValue(String.class));
+        
+        if (isApproved) {
+            title.setTextColor(getResources().getColor(R.color.colorAccentGreen));
+            title.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_checklist, 0);
+            title.setCompoundDrawablePadding(8);
+        }
+    }
+
+    private void disableAllInputs() {
+        View[] views = {etTitle1, etDesc1, actDomain1, etTitle2, etDesc2, actDomain2, etTitle3, etDesc3, actDomain3};
+        for (View v : views) {
+            v.setEnabled(false);
+            v.setFocusable(false);
+        }
     }
 
     private void submitTopics() {
@@ -196,7 +215,6 @@ public class TopicApprovalActivity extends BaseActivity {
         btnSubmitApproval.setText("Submitting...");
 
         Map<String, Object> submittedTopics = new HashMap<>();
-        
         submittedTopics.put("topic1", createTopicMap(etTitle1, actDomain1, etDesc1));
         submittedTopics.put("topic2", createTopicMap(etTitle2, actDomain2, etDesc2));
         submittedTopics.put("topic3", createTopicMap(etTitle3, actDomain3, etDesc3));
