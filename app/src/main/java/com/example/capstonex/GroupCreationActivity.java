@@ -23,7 +23,6 @@ import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,8 +30,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class GroupCreationActivity extends BaseActivity {
-
-    // BUG-003 / BUG-004 fixes applied — see generateIdAndExecute() and fetchUserDetails()
 
     private TextInputEditText etLeaderSap, etLeaderName, etLeaderRoll;
     private TextInputEditText etMember2Sap, etMember2Name, etMember2Roll;
@@ -112,7 +109,7 @@ public class GroupCreationActivity extends BaseActivity {
     }
 
     private void fetchUserDetails(String sap, TextInputEditText nameEt, TextInputEditText rollEt) {
-        mDatabase.child("Users").orderByChild("sapId").equalTo(sap)
+        mDatabase.child(AppConstants.NODE_USERS).orderByChild("sapId").equalTo(sap)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -129,14 +126,7 @@ public class GroupCreationActivity extends BaseActivity {
                             userCache.remove(sap);
                         }
                     }
-
-                    // ── BUG-004 FIX: show inline error instead of silent fail ──
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        nameEt.setText("");
-                        rollEt.setText("");
-                        nameEt.setError("Network error — try again");
-                    }
+                    @Override public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
 
@@ -151,15 +141,15 @@ public class GroupCreationActivity extends BaseActivity {
         Set<String> uniqueSaps = new HashSet<>();
         for (String sap : sapList) {
             if (sap.isEmpty()) { Toast.makeText(this, "Fill all visible fields", Toast.LENGTH_SHORT).show(); return; }
-            if (!uniqueSaps.add(sap)) { Toast.makeText(this, "Duplicate SAP ID found", Toast.LENGTH_SHORT).show(); return; }
+            if (!uniqueSaps.add(sap)) { Toast.makeText(this, "Duplicate SAP ID: " + sap, Toast.LENGTH_SHORT).show(); return; }
         }
 
         List<DataSnapshot> membersToProcess = new ArrayList<>();
         for (String sap : sapList) {
             DataSnapshot doc = userCache.get(sap);
-            if (doc == null) { Toast.makeText(this, "Invalid SAP ID: " + sap, Toast.LENGTH_SHORT).show(); return; }
+            if (doc == null) { Toast.makeText(this, "Details not found for SAP: " + sap, Toast.LENGTH_SHORT).show(); return; }
             if (Boolean.TRUE.equals(doc.child("hasGroup").getValue(Boolean.class))) {
-                Toast.makeText(this, doc.child("name").getValue(String.class) + " is already in a group", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, doc.child("name").getValue(String.class) + " is already in a group", Toast.LENGTH_LONG).show();
                 return;
             }
             membersToProcess.add(doc);
@@ -168,24 +158,18 @@ public class GroupCreationActivity extends BaseActivity {
         DataSnapshot leaderDoc = userCache.get(leaderSap);
         String branch = leaderDoc.child("branch").getValue(String.class);
         if (branch == null || branch.isEmpty()) branch = "IT";
-        int year = Calendar.getInstance().get(Calendar.YEAR);
+        int fixedYear = 2026;
 
-        generateIdAndExecute(branch.toUpperCase(), year, membersToProcess);
+        allocateGroupIdAndCreate(branch.toUpperCase(), fixedYear, membersToProcess);
     }
 
-    /**
-     * BUG-003 FIX: Replaced the racy read-max+1 pattern with a Firebase Transaction.
-     * Previously two concurrent calls could read the same maxNum and both write the
-     * same group ID, silently overwriting each other's data.
-     * A Transaction is atomic on the server — the counter is guaranteed to increment
-     * sequentially even under concurrent writes.
-     */
-    private void generateIdAndExecute(String branch, int year, List<DataSnapshot> memberDocs) {
+    private void allocateGroupIdAndCreate(String branch, int year, List<DataSnapshot> memberDocs) {
+        btnCreateGroup.setEnabled(false);
         progressDialog.setMessage("Allocating Group ID...");
-        if (!progressDialog.isShowing()) progressDialog.show();
+        progressDialog.show();
 
-        // Counter node: Counters/{BRANCH}{YEAR}  e.g. Counters/IT2026
-        DatabaseReference counterRef = mDatabase.child("Counters").child(branch + year);
+        // Node: Counters/IT2026
+        DatabaseReference counterRef = mDatabase.child(AppConstants.NODE_COUNTERS).child(branch + year);
         final String prefix = branch + year + "_";
 
         counterRef.runTransaction(new Transaction.Handler() {
@@ -193,80 +177,71 @@ public class GroupCreationActivity extends BaseActivity {
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData currentData) {
                 Integer current = currentData.getValue(Integer.class);
-                currentData.setValue(current == null ? 1 : current + 1);
+                if (current == null) current = 0;
+                currentData.setValue(current + 1);
                 return Transaction.success(currentData);
             }
 
             @Override
-            public void onComplete(@Nullable DatabaseError error, boolean committed,
-                                   @Nullable DataSnapshot currentData) {
-                if (!committed || error != null || currentData == null) {
+            public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot snapshot) {
+                if (committed && snapshot != null) {
+                    Integer count = snapshot.getValue(Integer.class);
+                    executeCreation(prefix + count, memberDocs);
+                } else {
                     progressDialog.dismiss();
-                    Toast.makeText(GroupCreationActivity.this,
-                            "Failed to allocate Group ID. Please try again.",
-                            Toast.LENGTH_SHORT).show();
-                    return;
+                    btnCreateGroup.setEnabled(true);
+                    Toast.makeText(GroupCreationActivity.this, "Transaction failed", Toast.LENGTH_SHORT).show();
                 }
-                Integer count = currentData.getValue(Integer.class);
-                if (count == null) {
-                    progressDialog.dismiss();
-                    Toast.makeText(GroupCreationActivity.this,
-                            "Counter error. Please try again.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                String newGroupId = prefix + count;
-                executeCreation(newGroupId, memberDocs);
             }
         });
     }
 
     private void executeCreation(String groupId, List<DataSnapshot> memberDocs) {
-        progressDialog.setMessage("Creating " + groupId + "...");
+        progressDialog.setMessage("Finalizing " + groupId + "...");
         Map<String, Object> updates = new HashMap<>();
-        List<String> uids = new ArrayList<>();
-        List<Map<String, String>> details = new ArrayList<>();
+        List<String> memberUids = new ArrayList<>();
+        List<Map<String, String>> memberDetails = new ArrayList<>();
 
-        String leaderUid = memberDocs.get(0).getKey(); // First member (position 0) is always the leader
+        String firstStudentUid = memberDocs.get(0).getKey();
 
         for (DataSnapshot doc : memberDocs) {
             String uid = doc.getKey();
-            uids.add(uid);
+            memberUids.add(uid);
             Map<String, String> d = new HashMap<>();
             d.put("sapId", doc.child("sapId").getValue(String.class));
             d.put("name", doc.child("name").getValue(String.class));
             d.put("rollNo", doc.child("rollNo").getValue(String.class));
-            details.add(d);
+            memberDetails.add(d);
 
-            updates.put("/Users/" + uid + "/groupId", groupId);
-            updates.put("/Users/" + uid + "/hasGroup", true);
+            updates.put("/" + AppConstants.NODE_USERS + "/" + uid + "/groupId", groupId);
+            updates.put("/" + AppConstants.NODE_USERS + "/" + uid + "/hasGroup", true);
 
-            String nid = mDatabase.child("Notifications").push().getKey();
+            String notifId = mDatabase.child(AppConstants.NODE_NOTIFICATIONS).push().getKey();
             Map<String, Object> n = new HashMap<>();
-            n.put("userId", uid);
-            n.put("title", "Group Assigned");
+            n.put("userId", uid); n.put("title", "Group Assigned");
             n.put("message", "You have been added to group " + groupId);
-            n.put("groupId", groupId);
-            n.put("timestamp", ServerValue.TIMESTAMP);
+            n.put("groupId", groupId); n.put("timestamp", ServerValue.TIMESTAMP);
             n.put("isRead", false);
-            if (nid != null) updates.put("/Notifications/" + nid, n);
+            if (notifId != null) updates.put("/" + AppConstants.NODE_NOTIFICATIONS + "/" + notifId, n);
         }
 
         Map<String, Object> group = new HashMap<>();
         group.put("groupId", groupId);
-        group.put("leaderUid", leaderUid);
-        group.put("memberUids", uids);
-        group.put("memberDetails", details);
+        group.put("leaderUid", firstStudentUid); // Always set to first student UID
+        group.put("memberUids", memberUids);
+        group.put("memberDetails", memberDetails);
         group.put("status", "Active");
         group.put("createdAt", ServerValue.TIMESTAMP);
 
-        updates.put("/Groups/" + groupId, group);
+        updates.put("/" + AppConstants.NODE_GROUPS + "/" + groupId, group);
 
         mDatabase.updateChildren(updates).addOnCompleteListener(task -> {
             progressDialog.dismiss();
             if (task.isSuccessful()) {
-                Toast.makeText(this, "Group " + groupId + " Created Successfully!", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Group " + groupId + " Created!", Toast.LENGTH_LONG).show();
                 finish();
             } else {
+                btnCreateGroup.setEnabled(true);
                 Toast.makeText(this, "Creation Failed", Toast.LENGTH_SHORT).show();
             }
         });
